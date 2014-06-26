@@ -1,0 +1,37 @@
+\documentclass[parskip]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[round]{natbib}
+\usepackage{color} % used for comments
+\usepackage{listings}
+\usepackage{url}
+\lstset {
+  language=xml,
+  basicstyle={\footnotesize\ttfamily},
+  numbers=none,
+  aboveskip=5mm,
+  belowskip=5mm,
+  showstringspaces=false,
+  columns=flexible,
+  keywordstyle={\bfseries\color{Blue}},
+  commentstyle={\color{Red}\textit},
+  stringstyle=\color{Magenta},
+  frame=single,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4,
+  morekeywords={rdf,rdfs,owl}  % <-- adding custom keywords
+}
+
+\begin{document}
+	\subject{}
+	\title{}
+	\author{}
+	\date{\today}
+	
+	\maketitle
+	
+%	\bibliographystyle{lnig.bst}
+%	\bibliography{}
+	
+\end{document}
