@@ -30,75 +30,70 @@
 	\date{\today}
 	
 	\maketitle
-	
 	\tableofcontents
-	
 	\newpage
 	
 	\section{Themenbeschreibung}
-	Ziel des Projektes ist, eine Smartcard mit Patientendaten zur Verfügung zu stellen. Diese Daten umfassen:
+		Ziel des Projektes ist es, eine Smartcard mit Patientendaten zur Verfügung zu stellen, die im medizinischen Sektor Automatisierung ermöglicht und Arbeitsabläufe unterstützt. Die Smartcard stellt folgende Daten bereit:
 
-	\begin{itemize}
-	\item eine Patienten-ID
-	\item die Patientenblutgruppe
-	\item eine Liste nicht verträglicher Medikamente
-	\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen
-	\end{itemize}
+		\begin{itemize}
+			\item eine Patienten-ID
+			\item die Patientenblutgruppe
+			\item eine Liste nicht verträglicher Medikamente
+			\item eine List regelmäßig einzunehmender Medikamente, incl. Dosierungsinformationen
+		\end{itemize}
+			
+		Die Patientendaten auf der Smartcard können von verschiedenen Rollen(Personen) ausgelesen werden, die jeweils verschiedene Rechte besitzen. Beispielsweise ein Pfleger darf die Liste regelmäßig einzunehmender Medikamente auslesen, der Hausarzt darf hingegen alle Daten auslesen.
 		
-	Die Patientendaten können von verschiedenen Personen ausgelesen werden, die jeweils verschiedene Rechte besitzen. Beispielsweise ein Pfleger darf die Liste regelmäßig einzunehmender Medikamente auslesen, der Hausarzt darf hingegen alles auslesen.
+		Um die Datenübertragung zwischen Lesegerät bzw. Offcard-Software und Smartcard abzusichern, wird RSA benutzt. Das erlaubt sowohl eine Verschlüsselung der Daten, als auch eine Absicherung zwischen den verschiedenen Rollen. 
+		
+		Als Anwendungsfälle könnten gelten:
 	
-	Um die Datenübertragung zwischen Lesegerät und Smartcard abzusichern wird RSA benutzt. Das erlaubt sowohl eine Verschlüsselung der Daten, als auch eine Absicherung zwischen den verschiedenen Rollen. 
-	
-Als Anwendungsfälle könnten gelten:
-
-\begin{description}
-\item[Notarzt] Im Falle eines Unfalls muss der Notarzt schnell auf Informationen wie Blutgruppe, nicht verträgliche Medikamente und aktuell verschriebene Medikamente zugreifen können, auch wenn der Patient bewusstlos ist. 
-\item[Automatisierte Medikamentenausgabe] Über die Liste regelmäßig einzunehmender Medikamente inklusive Dosierungsinformationen könnten an einem Automaten den Patienten Medikamente aushändigt werden.
-\end{description}
+		\begin{description}
+			\item[Notarzt] Im Falle eines Unfalls muss der Notarzt schnell auf Informationen wie Blutgruppe, nicht verträgliche Medikamente und aktuell verschriebene Medikamente zugreifen können, auch wenn der Patient bewusstlos ist. 
+			\item[Automatisierte Medikamentenausgabe] Über die Liste regelmäßig einzunehmender Medikamente inklusive Dosierungsinformationen könnten an einem Automaten dem Patienten Medikamente aushändigt werden.
+		\end{description}
 	
 	\section{Programmverteilung}
-	Die Applikationen müssen sowohl in eine Oncard- sowie Offcard-Bereich aufgeteilt werden, der verschiedene Anwendungsfälle umfasst.
+		Die Applikationen müssen sowohl in eine Oncard- sowie Offcard-Bereich aufgeteilt werden, der verschiedene Anwendungsfälle umfasst.
 
-	\subsection{Oncard}
-	
-	\paragraph{Funktionsumfang}
-	Die Smartcard enthält:
-	
-	\begin{itemize}
-	\item eine Patienten-ID
-	\item die Patientenblutgruppe, codiert als Zahl
-	\item eine Liste nicht verträglicher Medikamente, in Form einer Liste aus Medikamenten-IDs
-	\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen bestehen aus: Medikamente-ID, Menge und Zeitpunkt(en)
-	\item RSA-Schlüsselpaare sowohl für die Karte selbst, als auch für Nutzerrollen
-	\end{itemize}
-
-	Zugegriffen werden kann auf die Smartcard über eine Auswahl von Funktionen, die die Daten sowohl manipulieren als auch auslesen können.
-	
-	\begin{description}
-	\item[addToWhitelist()] Hinzufügen eines Eintrages zur Liste einzunehmender Medikamente.
-	\item[removeFromWhitelist()] Entfernen eines Eintrages aus der Liste einzunehmender Medikamente.
-	\item[addToBlacklist()] Hinzufügen eines Eintrages zur Liste nicht verträglicher Medikamente.
-	\item[removeFromBlacklist()] Entfernen eines Eintrages von der Liste nicht verträglicher Medikamente.
-	\item[readWhitelist] Auslesen der vollständigen Liste einzunehmender Medikamente.
-	\item[readBlacklist] Auslesen der vollständigen Liste nicht verträglicher Medikamente.
-	\item[readPatientID] Patienten-ID auslesen.
-	\item[readBloodType] Blutgruppe auslesen.
-	\end{description}
-	
-	Bei jedem Aufruf einer Funktion wird die Rollen-ID zur Zugriffssteuerung als Parameter übergeben. Jegliche Kommunikation zwischen Karte und Anwendung wird verschlüsselt.
-
-	\subsection{Offcard}
-	Die Offcard-Seite ist eine rollenspezifische Anwendung zur Bearbeitung und Visualisierung der auf der Karte verfügbaren Daten. Je nach ausgewählter Rolle können verschiedene Aktionen durchgeführt werden, die dem APDU-Interface der Oncard-Anwendung entsprechen. Je nach Rolle stehen verschieden viele Anwendungfälle zu Verfügung. Umgesetzt wird der Offcard-Teil durch eine Java-GUI-Anwendung. 
-	
-	% TODO
-	% Datenhaltung für Medikamenten-ID --> zb XML
-	% genauere Funktionsbeschreibung
-	% ggf. GUI-Prototyp
-	% 
-	
+		\subsection{Oncard}
+		
+			\paragraph{Funktionsumfang}
+			Die Smartcard enthält:
+			
+			\begin{itemize}
+				\item eine Patienten-ID
+				\item die Patientenblutgruppe, codiert als Zahl
+				\item eine Liste nicht verträglicher Medikamente, in Form einer Liste aus Medikamenten-IDs
+				\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen bestehen aus: Medikamente-ID, Menge und Zeitpunkt(en)
+				\item RSA-Schlüsselpaare sowohl für die Karte selbst, als auch für Nutzerrollen
+			\end{itemize}
+		
+			Zugegriffen werden kann auf die Smartcard über eine Auswahl von Funktionen, die die Daten sowohl manipulieren als auch auslesen können.
+			
+			\begin{description}
+				\item[addToWhitelist()] Hinzufügen eines Eintrages zur Liste einzunehmender Medikamente.
+				\item[removeFromWhitelist()] Entfernen eines Eintrages aus der Liste einzunehmender Medikamente.
+				\item[addToBlacklist()] Hinzufügen eines Eintrages zur Liste nicht verträglicher Medikamente.
+				\item[removeFromBlacklist()] Entfernen eines Eintrages von der Liste nicht verträglicher Medikamente.
+				\item[readWhitelist] Auslesen der vollständigen Liste einzunehmender Medikamente.
+				\item[readBlacklist] Auslesen der vollständigen Liste nicht verträglicher Medikamente.
+				\item[readPatientID] Patienten-ID auslesen.
+				\item[readBloodType] Blutgruppe auslesen.
+			\end{description}
+			
+			Bei jedem Aufruf einer Funktion wird die Rollen-ID zur Zugriffssteuerung als Parameter übergeben. Jegliche Kommunikation zwischen Karte und Anwendung wird verschlüsselt.
+		
+		\subsection{Offcard}
+			Die Offcard-Seite ist eine rollenspezifische Anwendung zur Bearbeitung und Visualisierung der auf der Karte verfügbaren Daten. Je nach ausgewählter Rolle können verschiedene Aktionen durchgeführt werden, die dem APDU-Interface der Oncard-Anwendung entsprechen. Je nach Rolle stehen verschieden viele Anwendungfälle zu Verfügung. Umgesetzt wird der Offcard-Teil durch eine Java-GUI-Anwendung. 
+			
+			% TODO
+			% Datenhaltung für Medikamenten-ID --> zb XML
+			% genauere Funktionsbeschreibung
+			% ggf. GUI-Prototyp
+		% 
+		
 	\section{Aufgabenverteilung}
-	
-%	\bibliographystyle{lnig.bst}
-%	\bibliography{}
 	
 \end{document}
