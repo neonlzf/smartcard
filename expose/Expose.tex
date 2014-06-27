@@ -30,6 +30,7 @@
 	\date{\today}
 	
 	\maketitle
+	\vspace{\fill}
 	\tableofcontents
 	\newpage
 	
@@ -55,44 +56,42 @@
 		\end{description}
 	
 	\section{Programmverteilung}
-		Die Applikationen müssen sowohl in eine Oncard- sowie Offcard-Bereich aufgeteilt werden, der verschiedene Anwendungsfälle umfasst.
+		Die Applikationen müssen sowohl in eine Oncard- sowie Offcard-Bereich aufgeteilt werden, der jeweils verschiedene Anwendungsfälle umfasst.
 
 		\subsection{Oncard}
 		
 			\paragraph{Funktionsumfang}
-			Die Smartcard enthält:
+			Die Smartcard enthält folgende Daten, die teils fest einkodiert sind.:
 			
 			\begin{itemize}
 				\item eine Patienten-ID
 				\item die Patientenblutgruppe, codiert als Zahl
-				\item eine Liste nicht verträglicher Medikamente, in Form einer Liste aus Medikamenten-IDs
-				\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen bestehen aus: Medikamente-ID, Menge und Zeitpunkt(en)
+				\item eine Liste nicht verträglicher Medikamente, bestehend aus Medikamenten-IDs
+				\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen, bestehend aus Medikamente-ID(s), Menge(n) und Zeitpunkt(en)
 				\item RSA-Schlüsselpaare sowohl für die Karte selbst, als auch für Nutzerrollen
 			\end{itemize}
 		
 			Zugegriffen werden kann auf die Smartcard über eine Auswahl von Funktionen, die die Daten sowohl manipulieren als auch auslesen können.
 			
 			\begin{description}
-				\item[addToWhitelist()] Hinzufügen eines Eintrages zur Liste einzunehmender Medikamente.
-				\item[removeFromWhitelist()] Entfernen eines Eintrages aus der Liste einzunehmender Medikamente.
-				\item[addToBlacklist()] Hinzufügen eines Eintrages zur Liste nicht verträglicher Medikamente.
-				\item[removeFromBlacklist()] Entfernen eines Eintrages von der Liste nicht verträglicher Medikamente.
-				\item[readWhitelist] Auslesen der vollständigen Liste einzunehmender Medikamente.
-				\item[readBlacklist] Auslesen der vollständigen Liste nicht verträglicher Medikamente.
-				\item[readPatientID] Patienten-ID auslesen.
-				\item[readBloodType] Blutgruppe auslesen.
+				\item[addToWhitelist] Hinzufügen eines Eintrages zur Liste einzunehmender Medikamente
+				\item[removeFromWhitelist] Entfernen eines Eintrages aus der Liste einzunehmender Medikamente
+				\item[addToBlacklist] Hinzufügen eines Eintrages zur Liste nicht verträglicher Medikamente
+				\item[removeFromBlacklist] Entfernen eines Eintrages von der Liste nicht verträglicher Medikamente
+				\item[readWhitelist] Auslesen der vollständigen Liste einzunehmender Medikamente
+				\item[readBlacklist] Auslesen der vollständigen Liste nicht verträglicher Medikamente
+				\item[readPatientID] Patienten-ID auslesen
+				\item[readBloodType] Blutgruppe auslesen
 			\end{description}
 			
-			Bei jedem Aufruf einer Funktion wird die Rollen-ID zur Zugriffssteuerung als Parameter übergeben. Jegliche Kommunikation zwischen Karte und Anwendung wird verschlüsselt.
+			Bei jedem Aufruf einer Funktion wird die Rollen-ID zur Zugriffssteuerung als Parameter übergeben. Jegliche Kommunikation zwischen Karte und Anwendung wird RSA verschlüsselt.
 		
 		\subsection{Offcard}
-			Die Offcard-Seite ist eine rollenspezifische Anwendung zur Bearbeitung und Visualisierung der auf der Karte verfügbaren Daten. Je nach ausgewählter Rolle können verschiedene Aktionen durchgeführt werden, die dem APDU-Interface der Oncard-Anwendung entsprechen. Je nach Rolle stehen verschieden viele Anwendungfälle zu Verfügung. Umgesetzt wird der Offcard-Teil durch eine Java-GUI-Anwendung. 
+			Die Offcard-Seite ist eine rollenspezifische Anwendung zur Bearbeitung und Visualisierung der auf der Karte verfügbaren Daten. Je nach ausgewählter Rolle können verschiedene Aktionen durchgeführt werden, die dem APDU-Interface der Oncard-Anwendung entsprechen. Je nach Rolle stehen verschieden viele Anwendungsfälle zu Verfügung. Umgesetzt wird der Offcard-Teil durch eine Java-GUI-Anwendung. 
 			
-			% TODO
-			% Datenhaltung für Medikamenten-ID --> zb XML
-			% genauere Funktionsbeschreibung
-			% ggf. GUI-Prototyp
-		% 
+			Die Datenhaltung der Medikamente erfolgt, entspechend des beschränkten Umfangs des Beispielprojekts, über eine strukturierte Textdatei. Diese kann beliebig um weitere Medikamente incl. ID erweitert werden.
+			
+			Die Anwendung bietet die Möglichkeit, sich eine der verfügbaren Rollen auszuwählen und die benötigte Daten von der Smartcard zu lesen sowie anzuzeigen.
 		
 	\section{Aufgabenverteilung}
 	
