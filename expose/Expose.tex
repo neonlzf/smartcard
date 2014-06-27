@@ -44,9 +44,11 @@
 			\item eine List regelmäßig einzunehmender Medikamente, incl. Dosierungsinformationen
 		\end{itemize}
 			
-		Die Patientendaten auf der Smartcard können von verschiedenen Rollen(Personen) ausgelesen werden, die jeweils verschiedene Rechte besitzen. Beispielsweise ein Pfleger darf die Liste regelmäßig einzunehmender Medikamente auslesen, der Hausarzt darf hingegen alle Daten auslesen.
+		Die Patientendaten auf der Smartcard können von verschiedenen Rollen (Personen) ausgelesen werden, die jeweils verschiedene Rechte besitzen. Beispielsweise darf ein Pfleger nur die Liste regelmäßig einzunehmender Medikamente auslesen, der Hausarzt darf hingegen alle Daten auslesen.
 		
-		Um die Datenübertragung zwischen Lesegerät bzw. Offcard-Software und Smartcard abzusichern, wird RSA benutzt. Das erlaubt sowohl eine Verschlüsselung der Daten, als auch eine Absicherung zwischen den verschiedenen Rollen. 
+		% todo Rechte-Tabelle einfügen
+		
+		Um die Datenübertragung zwischen Lesegerät bzw. Offcard-Software und Smartcard abzusichern, wird RSA verwendet. Das erlaubt sowohl eine Verschlüsselung der Daten, als auch eine Absicherung zwischen den verschiedenen Rollen. 
 		
 		Als Anwendungsfälle könnten gelten:
 	
@@ -94,5 +96,10 @@
 			Die Anwendung bietet die Möglichkeit, sich eine der verfügbaren Rollen auszuwählen und die benötigte Daten von der Smartcard zu lesen sowie anzuzeigen.
 		
 	\section{Aufgabenverteilung}
+		\begin{description}
+			\item[Oncard-Anteil] Sebastian Krause
+			\item[Offcard-Anteil] Roy Meissner
+			\item[Verschlüsselung] Robert Kupferschmied
+		\end{description}
 	
 \end{document}
