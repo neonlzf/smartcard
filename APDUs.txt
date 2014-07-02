@@ -1,0 +1,56 @@
+1b ^= first byte and so on
+
+
+
+JavaCardAvailable:
+	INS: 0x00
+	LE: 7
+	Return: IM_HERE
+	
+Blacklist: Maximum: 127 drugs --> drug as Int
+***********************************
+
+	ReadBlacklist:
+		INS: 0x01
+		LE: 4
+		Return: 0x1b 2b 3b 4b --> Compose to unsigned Int by 1b ++ 2b ++ 3b ++ 4b
+		--> To quantity, more than 1 APDU is sent, Last element is (every time) 0x00 00 00 00
+		--> If empty: 0x00 00 00 00
+	
+	AddToBlacklist:
+		INS: 0x02
+		LC: 4
+		Daten: 0x1b 2b 3b 4b
+		LE: 1
+		Return: 0x00 -> Failure, List is full, 0x01 -> Success
+
+Whitelist: Maximum: 127 drugs
+***********************************
+Drug ID (4 Byte) followed by time-slots (defined as Byte: XXXY YYYY; x-Quantity, y-time (0-23)) --> 28 Byte length
+
+	ReadWhitelist:
+		INS: 0x03
+		LE: 28 or 4
+		Return: 0x1b 2b 3b 4b ...
+		--> To quantity, more than 1 APDU is sent, Last element is (every time) 0x00 00 00 00
+		--> If empty: 0x00 00 00 00
+	
+	AddToWhitelist:
+		INS: 0x04
+		LC: 28
+		Daten: See Whitelist Description
+		LE: 1
+		Return: 0x00 -> Failure, List is full, 0x01 -> Success
+
+***********************************
+	
+ReadBloodType:
+	INS: 0x05
+	LE: 1
+	Return: 0xBloodtype --> 00 - A-, 01 - A+, 02 - B-, 03 - B+, 04 - AB-, 05 - AB+, 06 - 0-, 07 - 0+
+	
+ReadPatientID: //PatienID as Long
+	INS: 0x06
+	LE: 8
+	Return: 0x1b 2b 3b 4b ... --> Compose to Long by 1b ++ 2b ++ 3b ++ 4b ++ ...
+
