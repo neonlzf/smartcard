@@ -12,45 +12,59 @@ Blacklist: Maximum: 127 drugs --> drug as Int
 
 	ReadBlacklist:
 		INS: 0x01
+		P1P2: number of element as short
 		LE: 4
-		Return: 0x1b 2b 3b 4b --> Compose to unsigned Int by 1b ++ 2b ++ 3b ++ 4b
-		--> To quantity, more than 1 APDU is sent, Last element is (every time) 0x00 00 00 00
-		--> If empty: 0x00 00 00 00
+		Success Return: 0x1b 2b 3b 4b 90 00 --> Compose to Int by 1b ++ 2b ++ 3b ++ 4b
+		Failure Return: 0x6A 83
 	
 	AddToBlacklist:
 		INS: 0x02
 		LC: 4
 		Daten: 0x1b 2b 3b 4b
-		LE: 1
-		Return: 0x00 -> Failure, List is full, 0x01 -> Success
-
+		Success Return: 0x90 00
+		Failure Return: 0x6A 84
+		
+	RemoveFromBlacklist
+		INS: 0x03
+		LC: 4
+		Daten: 0x1b 2b 3b 4b
+		Success Return: 0x90 00
+		Failure Return: 0x6A 83
+		
 Whitelist: Maximum: 127 drugs
 ***********************************
 Drug ID (4 Byte) followed by time-slots (defined as Byte: XXXY YYYY; x-Quantity, y-time (0-23)) --> 28 Byte length
 
 	ReadWhitelist:
-		INS: 0x03
-		LE: 28 or 4
-		Return: 0x1b 2b 3b 4b ...
-		--> To quantity, more than 1 APDU is sent, Last element is (every time) 0x00 00 00 00
-		--> If empty: 0x00 00 00 00
+		INS: 0x04
+		P1P2: number of element as short
+		LE: 28
+		Success Return: 0x1b 2b 3b 4b 90 00 --> Compose to structure described above
+		Failure Return: 0x6A 83
 	
 	AddToWhitelist:
-		INS: 0x04
+		INS: 0x05
 		LC: 28
-		Daten: See Whitelist Description
-		LE: 1
-		Return: 0x00 -> Failure, List is full, 0x01 -> Success
+		Daten: 0x1b 2b 3b 4b ...
+		Success Return: 0x90 00
+		Failure Return: 0x6A 84
+		
+	RemoveFromBlacklist
+		INS: 0x06
+		LC: 4
+		Daten: 0x1b 2b 3b 4b --> ID of Drug
+		Success Return: 0x90 00
+		Failure Return: 0x6A 83
 
 ***********************************
 	
 ReadBloodType:
-	INS: 0x05
+	INS: 0x07
 	LE: 1
 	Return: 0xBloodtype --> 00 - A-, 01 - A+, 02 - B-, 03 - B+, 04 - AB-, 05 - AB+, 06 - 0-, 07 - 0+
 	
 ReadPatientID: //PatienID as Long
-	INS: 0x06
+	INS: 0x08
 	LE: 8
 	Return: 0x1b 2b 3b 4b ... --> Compose to Long by 1b ++ 2b ++ 3b ++ 4b ++ ...
 

@@ -4,18 +4,25 @@ import javacard.framework.APDU;
 import javacard.framework.Applet;
 import javacard.framework.ISO7816;
 import javacard.framework.ISOException;
+import javacard.framework.Util;
 
 public class Patient extends Applet {
 
 	public static void install(byte[] bArray, short bOffset, byte bLength) {
 		// GP-compliant JavaCard applet registration
 		new Patient().register(bArray, (short) (bOffset + 1), bArray[bOffset]);
-		
+
 		blacklist = new DrugList((byte) 4);
 		whitelist = new DrugList((byte) 28);
 		PatientID = new byte[8];
-		Bloodtype = (byte) 0xFF;
+		// bLength must be 9
+		for (byte i = 0; i < 8; i++)
+			PatientID[i] = bArray[bOffset + i];
+		Bloodtype = (byte) bArray[bOffset + 8];
+		buffer = new byte[whitelist.datalength];
 	}
+
+	static byte buffer[];
 
 	static DrugList blacklist;
 
@@ -47,15 +54,21 @@ public class Patient extends Applet {
 			addToBlacklist(buf, apdu);
 			break;
 		case (byte) 0x03:
-			sendWhitelist(buf, apdu);
+			removeFromBlacklist(buf, apdu);
 			break;
 		case (byte) 0x04:
-			addToWhitelist(buf, apdu);
+			sendWhitelist(buf, apdu);
 			break;
 		case (byte) 0x05:
-			sendBloodType(buf, apdu);
+			addToWhitelist(buf, apdu);
 			break;
 		case (byte) 0x06:
+			removeFromWhitelist(buf, apdu);
+			break;
+		case (byte) 0x07:
+			sendBloodType(buf, apdu);
+			break;
+		case (byte) 0x08:
 			sendPatientId(buf, apdu);
 			break;
 		default:
@@ -77,63 +90,57 @@ public class Patient extends Applet {
 
 	private void sendBlacklist(byte[] buf, APDU apdu) {
 
-		for (short i = 0; i <= blacklist.size() && !(i < 0); i++) {
-			byte buffer[] = blacklist.getElement(i);
-			for (byte s = 0; s < blacklist.datalength; s++) {
-				buf[s] = buffer[s];
-			}
-			sendEncryptedAPDU(apdu, (short) blacklist.datalength);
-		}
+		short element = Util
+				.getShort(buf, (short) (ISO7816.OFFSET_P1 & 0x00FF));
+		byte buffer[] = blacklist.getElement(element);
+		Util.arrayCopy(buffer, (short) 0, buf, (short) 0, blacklist.datalength);
+		sendEncryptedAPDU(apdu, blacklist.datalength);
 	}
 
 	private void addToBlacklist(byte[] buf, APDU apdu) {
 
-		byte[] buffer = new byte[blacklist.datalength];
+		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer,
+				(short) 0, blacklist.datalength);
+		blacklist.add(buffer);
+	}
 
-		for (byte i = 0; i < blacklist.datalength; i++)
-			buffer[i] = buf[ISO7816.OFFSET_CDATA + i];
+	private void removeFromBlacklist(byte[] buf, APDU apdu) {
 
-		if (blacklist.add(buffer)) { // Success
-			buf[0] = 0x01;
-			sendEncryptedAPDU(apdu, (short) 1);
-		} else {
-			buf[0] = 0x00;
-			sendEncryptedAPDU(apdu, (short) 1);
-		}
-
+		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer,
+				(short) 0, blacklist.datalength);
+		blacklist.remove(buffer);
 	}
 
 	private void sendWhitelist(byte[] buf, APDU apdu) {
-		for (short i = 0; i <= whitelist.size() && !(i < 0); i++) {
-			byte buffer[] = whitelist.getElement(i);
-			for (byte s = 0; s < whitelist.datalength; s++) {
-				buf[s] = buffer[s];
-			}
-			sendEncryptedAPDU(apdu, (short) whitelist.datalength);
-		}
+		short element = Util
+				.getShort(buf, (short) (ISO7816.OFFSET_P1 & 0x00FF));
+		byte buffer[] = whitelist.getElement(element);
+		Util.arrayCopy(buffer, (short) 0, buf, (short) 0, whitelist.datalength);
+		sendEncryptedAPDU(apdu, whitelist.datalength);
 	}
 
 	private void addToWhitelist(byte[] buf, APDU apdu) {
-		byte[] buffer = new byte[whitelist.datalength];
 
-		for (byte i = 0; i < whitelist.datalength; i++)
-			buffer[i] = buf[ISO7816.OFFSET_CDATA + i];
+		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer,
+				(short) 0, whitelist.datalength);
+		whitelist.add(buffer);
+	}
+	
+	private void removeFromWhitelist(byte[] buf, APDU apdu) {
 
-		if (whitelist.add(buffer)) { // Success
-			buf[0] = 0x01;
-			sendEncryptedAPDU(apdu, (short) 1);
-		} else {
-			buf[0] = 0x00;
-			sendEncryptedAPDU(apdu, (short) 1);
-		}
+		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer,
+				(short) 0, blacklist.datalength);
+		whitelist.remove(buffer);
 	}
 
 	private void sendBloodType(byte[] buf, APDU apdu) {
+
 		buf[0] = Bloodtype;
 		sendEncryptedAPDU(apdu, (short) 1);
 	}
 
 	private void sendPatientId(byte[] buf, APDU apdu) {
+
 		for (byte i = 0; i < PatientID.length; i++) {
 			buf[i] = PatientID[i];
 		}
@@ -142,8 +149,9 @@ public class Patient extends Applet {
 
 	private void sendEncryptedAPDU(APDU apdu, short len) {
 		// Encrypt APDU
-		apdu.setOutgoingAndSend((short) 0, len);
+		apdu.setOutgoing();
+		apdu.setOutgoingLength(len);
+		apdu.sendBytes((short) 0, len);
+		ISOException.throwIt(ISO7816.SW_NO_ERROR);
 	}
-
 }
-

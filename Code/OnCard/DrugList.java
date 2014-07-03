@@ -1,5 +1,9 @@
 package patient;
 
+import javacard.framework.ISO7816;
+import javacard.framework.ISOException;
+import javacard.framework.Util;
+
 public class DrugList {
 
 	private static short listLength = 128;
@@ -12,8 +16,11 @@ public class DrugList {
 
 	private short capLeft;
 
+	private byte buffer[];
+
 	public DrugList(byte dataLength) {
 		this.datalength = dataLength;
+		buffer = new byte[dataLength];
 		list = new byte[(short) (listLength * datalength)];
 		capLeft = listLength;
 		firstfree = 0;
@@ -26,41 +33,38 @@ public class DrugList {
 
 	public byte[] getElement(short n) {
 
-		if (n < size() - 1) {
-			byte buf[] = new byte[datalength];
-			for (byte i = 0; i < datalength; i++)
-				buf[i] = list[n * datalength + i];
-			return buf;
-		} else
-			return new byte[] { 0, 0, 0, 0 };
+		if (n < size())
+			Util.arrayCopy(list, (short) (n * datalength), buffer, (short) 0,
+					datalength);
+		else
+			ISOException.throwIt(ISO7816.SW_RECORD_NOT_FOUND);
+		return buffer;
 	}
 
-	public boolean add(byte[] ID) {
+	public void add(byte[] ID) {
 
 		if (capLeft > 0) {
-			for (byte i = 0; i < datalength; i++) {
-				list[firstfree * datalength + i] = ID[i];
-			}
+			Util.arrayCopy(ID, (short) 0, list,
+					(short) (firstfree * datalength), datalength);
 			firstfree++;
 			capLeft--;
-			return true;
+			ISOException.throwIt(ISO7816.SW_NO_ERROR);
 		} else
-			return false;
+			ISOException.throwIt(ISO7816.SW_FILE_FULL);
 	}
 
-	public boolean remove(byte[] ID) {
+	public void remove(byte[] ID) {
 
 		for (short i = 0; i < listLength * datalength; i = (short) (i + datalength)) {
-			if (list[i] == ID[0] && list[i + 1] == ID[1]
-					&& list[i + 2] == ID[2] && list[i + 3] == ID[3]) {
-				for (short s = i; s < listLength * datalength; s++)
-					list[s] = list[s + datalength];
+			if (Util.arrayCompare(list, i, ID, (short) 0, (short) 4) == 0) {
+				Util.arrayCopy(list, (short) (i + datalength), list, i,
+						(short) (size() * datalength - i));
 				firstfree--;
 				capLeft++;
-				return true;
+				ISOException.throwIt(ISO7816.SW_NO_ERROR);
 			}
 		}
-		return false;
+		ISOException.throwIt(ISO7816.SW_RECORD_NOT_FOUND);
 	}
 }
 
