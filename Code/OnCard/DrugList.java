@@ -17,6 +17,8 @@ public class DrugList {
 	private short capLeft;
 
 	private byte buffer[];
+	
+	short i;
 
 	public DrugList(byte dataLength) {
 		this.datalength = dataLength;
@@ -55,7 +57,7 @@ public class DrugList {
 
 	public void remove(byte[] ID) {
 
-		for (short i = 0; i < listLength * datalength; i = (short) (i + datalength)) {
+		for (i = 0; i < listLength * datalength; i = (short) (i + datalength)) {
 			if (Util.arrayCompare(list, i, ID, (short) 0, (short) 4) == 0) {
 				Util.arrayCopy(list, (short) (i + datalength), list, i,
 						(short) (size() * datalength - i));

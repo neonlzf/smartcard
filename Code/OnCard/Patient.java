@@ -31,9 +31,10 @@ public class Patient extends Applet {
 	static byte Bloodtype;
 
 	static byte[] PatientID;
+	
+	byte i;
 
 	public void process(APDU apdu) {
-		// Good practice: Return 9000 on SELECT
 		if (selectingApplet()) {
 			return;
 		}
@@ -72,7 +73,6 @@ public class Patient extends Applet {
 			sendPatientId(buf, apdu);
 			break;
 		default:
-			// good practice: If you don't know the INStruction, say so:
 			ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
 		}
 	}
@@ -141,7 +141,7 @@ public class Patient extends Applet {
 
 	private void sendPatientId(byte[] buf, APDU apdu) {
 
-		for (byte i = 0; i < PatientID.length; i++) {
+		for (i = 0; i < PatientID.length; i++) {
 			buf[i] = PatientID[i];
 		}
 		sendEncryptedAPDU(apdu, (short) PatientID.length);
