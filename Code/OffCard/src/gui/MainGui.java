@@ -44,6 +44,8 @@ import java.awt.Rectangle;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 
+import card.CardHandler;
+
 import data.MedTableModel;
 import data.PatientDataTableModel;
 
@@ -73,6 +75,8 @@ public class MainGui {
 	private MedTableModel wlData;
 	private MedTableModel blData;
 
+	private CardHandler ch;
+
 	/**
 	 * Launch the application.
 	 */
@@ -94,6 +98,7 @@ public class MainGui {
 	 * Create the application.
 	 */
 	public MainGui() {
+		this.ch = CardHandler.getInstance();
 		initialize();
 	}
 
@@ -301,7 +306,6 @@ public class MainGui {
 
 	private class LoadAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			// TODO: load Data from SmartCard
@@ -321,7 +325,6 @@ public class MainGui {
 
 	private class SaveAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
 
@@ -331,7 +334,6 @@ public class MainGui {
 
 	private class BlackListAddAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			MedEdit me = new MedEdit(MainGui.this.blData, false);
 			me.setLocationRelativeTo(MainGui.this.frmMediplaner);
@@ -342,7 +344,6 @@ public class MainGui {
 
 	private class BlackListEditAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			int selection = MainGui.this.blacklistTable.getSelectedRow();
 			if (selection > -1) {
@@ -356,7 +357,6 @@ public class MainGui {
 
 	private class BlackListDeleteAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			int selectedRow = MainGui.this.blacklistTable.getSelectedRow();
 			if (selectedRow > -1)
@@ -367,7 +367,6 @@ public class MainGui {
 
 	private class WhiteListAddAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			MedEdit me = new MedEdit(MainGui.this.wlData, true);
 			me.setLocationRelativeTo(MainGui.this.frmMediplaner);
@@ -378,7 +377,6 @@ public class MainGui {
 
 	private class WhiteListEditAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			int selection = MainGui.this.whitelistTable.getSelectedRow();
 			if (selection > -1) {
@@ -392,7 +390,6 @@ public class MainGui {
 
 	private class WhiteListDeleteAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			int selectedRow = MainGui.this.whitelistTable.getSelectedRow();
 			if (selectedRow > -1)

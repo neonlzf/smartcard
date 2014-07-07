@@ -135,7 +135,6 @@ public class EditDosageGui extends JFrame {
 
 	private class OkAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (EditDosageGui.this.selected == -2) {
 				Dosage temp = new Dosage(EditDosageGui.this.comboBoxTime.getSelectedIndex(),
@@ -153,7 +152,6 @@ public class EditDosageGui extends JFrame {
 
 	private class CancelAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			EditDosageGui.this.dispose();
 		}

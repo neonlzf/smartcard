@@ -216,7 +216,6 @@ public class MedEdit extends JFrame {
 
 	private class OkAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (MedEdit.this.toEdit == null) {
 				MedEdit.this.addElement();
@@ -228,7 +227,6 @@ public class MedEdit extends JFrame {
 
 	private class CancelAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			MedEdit.this.dispose();
 		}
@@ -237,7 +235,6 @@ public class MedEdit extends JFrame {
 
 	private class AddDosageAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			EditDosageGui ed = new EditDosageGui(MedEdit.this.dtm);
 			ed.setLocationRelativeTo(MedEdit.this);
@@ -249,7 +246,6 @@ public class MedEdit extends JFrame {
 
 	private class EditDosageAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			int selectedRow = MedEdit.this.dosageTable.getSelectedRow();
 			if (selectedRow > -1) {
@@ -262,7 +258,6 @@ public class MedEdit extends JFrame {
 
 	private class DeleteDosageAction implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			int selectedRow = MedEdit.this.dosageTable.getSelectedRow();
 			if (selectedRow > -1) {
