@@ -1,49 +1,27 @@
 package gui;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-
-import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-
 import java.awt.Dimension;
-
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
-
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import javax.swing.JTable;
-
-import java.awt.GridBagConstraints;
-
-import javax.swing.table.DefaultTableModel;
-
-import java.awt.GridLayout;
-
-import javax.swing.BoxLayout;
-
-import java.awt.Insets;
-
-import javax.swing.border.TitledBorder;
-import javax.swing.border.LineBorder;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Rectangle;
-import java.io.IOException;
-
-import javax.swing.JScrollPane;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import opencard.core.terminal.CardTerminalException;
 import card.CardHandler;
@@ -340,11 +318,37 @@ public class MainGui {
 			PatientDataTableModel patientData = new PatientDataTableModel();
 			patientData.parseData(patientIdRaw, bloodTypeRaw);
 
+			// read black list
+			ArrayList<ByteBuffer> blRaw = new ArrayList<ByteBuffer>();
+			for (int i = 0; i < 128; i++) {
+				byte[] instBl = { 0x00, 0x01, 0x00, (byte) i };
+				byte[] blItem = null;
+				try {
+					blItem = ch.sendInstruction(instBl);
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+
+				System.out.println("readBlacklistItem(" + i + ") returned: " + ch.bytesToHex(blItem));
+
+				if (blItem.length == 2 && blItem[0] == (byte) 0x6A && blItem[1] == (byte) 0x83) {
+					System.out.println("Blacklist - Items read: " + i);
+					break;
+				}
+				
+				ByteBuffer tempBuffer = ByteBuffer.allocate(blItem.length);
+				tempBuffer.put(blItem);
+				tempBuffer.rewind();
+				blRaw.add(tempBuffer);
+			}
+
 			MedTableModel blData = new MedTableModel();
-			blData.parseData();
+			blData.parseData(null);
 
 			MedTableModel wlData = new MedTableModel();
-			wlData.parseData();
+			wlData.parseData(null);
 
 			MainGui.this.loadData(patientData, blData, wlData);
 		}

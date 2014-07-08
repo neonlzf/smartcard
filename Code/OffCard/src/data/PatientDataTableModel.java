@@ -10,22 +10,21 @@ public class PatientDataTableModel extends DefaultTableModel {
 
 	private long patientId;
 	private short bloodType;
-	private String[] bloodTypes = { "A-", "A+", "B-", "B+", "AB-", "AB+", "0-", "0+" };
+	private String[] bloodTypes = { "A -", "A +", "B -", "B +", "AB -", "AB +", "0 -", "0 +" };
 
 	public PatientDataTableModel() {
 	}
 
 	public void parseData(byte[] patientIdRaw, byte[] bloodTypeRaw) {
-		System.out.println("Sizes: " + patientIdRaw.length + " " + bloodTypeRaw.length);
 		ByteBuffer patBuffer = ByteBuffer.allocate(10);
 		patBuffer.put(patientIdRaw);
 		patBuffer.rewind();
 		this.patientId = patBuffer.getLong();
+
 		ByteBuffer btBuffer = ByteBuffer.allocate(3);
 		btBuffer.put(bloodTypeRaw);
 		btBuffer.rewind();
 		this.bloodType = (short) btBuffer.get(0);
-		System.out.println("ID: " + this.patientId + "BT: " + this.bloodType);
 	}
 
 	@Override
