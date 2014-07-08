@@ -45,12 +45,12 @@ public class RSA extends Applet {
 	/**
 	 * EXPORT_RSA_PUBLIC_Key = F0
 	 */
-	private final static byte EXPORT_RSA_MOD_EXP = (byte) 0xF0;
+	private final static byte EXPORT_RSA_PUB_MOD = (byte) 0xF0;
 
 	/**
 	 * EXPORT_RSA_PUBLIC_Key = F2
 	 */
-	private final static byte EXPORT_RSA_PUBLIC_EXP = (byte) 0xF2;
+	private final static byte EXPORT_RSA_PUB_EXP = (byte) 0xF2;
 
 	/**
 	 * encode/decode with public exponent (own/other party) = D0
@@ -102,10 +102,10 @@ public class RSA extends Applet {
 		byte[] buf = apdu.getBuffer();
 		short lc = (short) (buf[ISO7816.OFFSET_LC] & 0x00FF);
 		switch (buf[ISO7816.OFFSET_INS]) {
-		case EXPORT_RSA_PUBLIC_EXP:
+		case EXPORT_RSA_PUB_EXP:
 			exportPublicExponent(apdu);
 			break;
-		case EXPORT_RSA_MOD_EXP:
+		case EXPORT_RSA_PUB_MOD:
 			exportPublicModulus(apdu);
 			break;
 		// export other parties modulus and public exponent
