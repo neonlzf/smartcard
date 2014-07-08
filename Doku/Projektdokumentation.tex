@@ -32,12 +32,22 @@
 
 \begin{document}
 \subject{Projektdokumentation im Modul Smartcard}
-\title{Erstellung einer Smartcard Anwendung}
-\author{Robert Kupferschmied}
-\date{30.06.2014}
+\title{Patientendateninformationskarte im medizinischen Sektor}
+\author{Robert Kupferschmied B.Sc., Roy Meissner B.Sc.,\\Sebastian Krause B.Sc.}
+\date{\today}
 
 \maketitle
 \onehalfspacing
+\section{Anwendungsbeschreibung}
+	Die Anwendung wurde zum Zweck entworfen, Mitarbeitern im medizinischem Sektor schnell Daten über die bedürftige Person bzw. dem Patienten zur Verfügung zu stellen. Zu diesem Zweck wurde ein System bestehend aus einer OffCard-Anwendung, die zur Beispielhaften Demonstration des medizinischen Personals da ist, sowie einer OnCard-Anwendung, die verschiedene Daten eines Patienten speichert, entworfen.
+	
+	Die OffCard-Anwendungen lässt es zu, eine Rolle auszuwählen. Anhand dieser Rolle kann auf verschiedene Funktionalitäten der SmartCard zugegriffen werden, je nachdem, welche Rechte die Rolle besitzt. Hauptanwendungszweck der OffCard-Anwendung ist die Anzeige der auf der SmartCard gespeicherten Daten, als auch die Manipulation dieser.
+	
+	Die OnCard-Anwendung speichert Patientenbezogene Daten, wie dessen Blutgruppe, dessen ID, sowie mehrere Listen von Medikamenten. Diese Daten können von den entsprechenden Rollen manipuliert werden.
+	
+	Um eine Absicherung gegen Angriffe bereit zu stellen, als auch die Rollen untereinander zuverlässig trennen zu können, wird eine Verschlüsselung der übertragenen Daten durchgesetzt.
+\section{OffCard}
+\section{OnCard}
 \section{Kryptologie}
 In diesem Kapitel werden die kryptografischen Methoden des Projektes erklärt. Zum Verschlüsseln der Daten wird ein symmetrisches Verfahren verwendet. Symmetrische Verschlüsselungsverfahren sind sehr effizient und sicher. Leider werden bei symmetrischen Verfahren nur ein Schlüssel zum Ver- und Entschlüsseln verwendet. Deswegen ist der Schlüsselaustausch sehr schwierig. Asymmetrische Verfahren können dieses Problem lösen.
 \subsection{Asymmetrische Verschlüsselung - RSA}
