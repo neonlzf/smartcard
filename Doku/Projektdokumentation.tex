@@ -1,0 +1,96 @@
+\documentclass[parskip]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[round]{natbib}
+\usepackage{graphicx}
+\usepackage[automark]{scrpage2}
+\usepackage{setspace}
+\usepackage{csquotes}
+\usepackage{amsmath}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage[colorlinks=false, pdfborder={0 0 0}]{hyperref}
+\lstset {
+  language=java,
+  basicstyle={\footnotesize\ttfamily},
+  numbers=none,
+  aboveskip=5mm,
+  belowskip=5mm,
+  showstringspaces=false,
+  columns=flexible,
+  keywordstyle=\color{red},
+  commentstyle=\color{red},
+  stringstyle=\color{magenta},
+  frame=single,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4,
+  morekeywords={ }% <-- adding custom keywords
+}
+
+\begin{document}
+\subject{Projektdokumentation im Modul Smartcard}
+\title{Erstellung einer Smartcard Anwendung}
+\author{Robert Kupferschmied}
+\date{30.06.2014}
+
+\maketitle
+\onehalfspacing
+\section{Kryptologie}
+In diesem Kapitel werden die kryptografischen Methoden des Projektes erklärt. Zum Verschlüsseln der Daten wird ein symmetrisches Verfahren verwendet. Symmetrische Verschlüsselungsverfahren sind sehr effizient und sicher. Leider werden bei symmetrischen Verfahren nur ein Schlüssel zum Ver- und Entschlüsseln verwendet. Deswegen ist der Schlüsselaustausch sehr schwierig. Asymmetrische Verfahren können dieses Problem lösen.
+\subsection{Asymmetrische Verschlüsselung - RSA}
+Zur asymmetrischen Verschlüsselung stehen auf den Smartcards prinzipiell zwei Algorithmen zur Verfügung. Zum einen der \enquote{elliptic Curve}-Algorithmus und der RSA\footnote{Rivest, Shamir und Adleman}-Algorithmus. Die Sicherheit des RSA-Algorithmus beruht auf dem Problem der Primzahlzerlegung. Das Problem der Primzahlzerlegung ist ein schwieriges Problem, da kein effizienter Algorithmus bekannt ist der das Problem lösen könnte. Weiterhin ist RSA der bekannteste und am weitesten verbreitete Algorithmus zur asymmetrischen Verschlüsselung. Um zu möglichst vielen Systemen kompatibel zu sein, wird der RSA-Algorithmus in diesem Projekt verwendet.\\
+Bei asymmetrischen Verschlüsselungsverfahren werden Schlüsselpaare für die Verschlüsselung benutzt. Diese Schlüsselpaare bestehen aus einem Public-Key und einem Private-Key. Der Public-Key kann publiziert werden. Den Private-Key muss man geheim halten.\\
+Die Schlüssel setzen sich aus einem Exponenten und einem Modulus. Der Modulus ist eine sehr große Zahl, bei RSA-1024 eine Zahl im Bereich von $ 2^{1024} $ und setzt sich aus zwei Primzahlen zusammen. Der Modulus ist im Public- und Private-Key gleich. Die Exponenten unterscheiden sich allerdings.\\
+Zur Ver- und Entschlüsselung werden folgende Funktionen benutzt:  
+ $$ G = K^{e}\mod{n} $$
+ $$ K = G^{d}\mod{n} $$
+ Legende: \\
+ G .. Geheimtext\\
+ K .. Klartext\\
+ e .. öffentlicher Exponent\\
+ d .. geheimer Exponent\\
+ n .. Modulus\\
+Die Schlüssel werden im der Datei \enquote{irgendwas.java} erzeugt. Hier sind diese Zeilen wichtig:
+\begin{lstlisting}
+Cipher rsaCipher = Cipher.getInstance(Cipher.ALG_RSA_PKCS1,false);
+KeyPair keyPair = new KeyPair(KeyPair.ALG_RSA_CRT, (short)1024);
+keyPair.genKeyPair();
+RSAPrivateCrtKey rsa_privateKey = (RSAPrivateCrtKey) keyPair.getPrivate();
+RSAPublicKey rsa_publicKey = (RSAPublicKey) keyPair.getPublic();
+\end{lstlisting}
+Die JCOP Shell hat beim erstellen der Schlüssel leider ein paar Fehler. Hier kann beim erzeugen des öffentlichen Schlüssels kein echter öffentlicher Exponent erzeugt werden, stattdessen wird nur eine konstante binäre 17 zurückgegeben.\\
+Auf einer echten Karte dürfte dieser Fehler nicht auftreten.\\
+Die Verschlüsselung mit asymmetrischen Verfahren ist nicht so effizient, wie die Verschlüsselung mit symmetrischen Verfahren. Deswegen ist es sinnvoll die symmetrische und asymmetrische Verfahren zu kombinieren um die Vorteile aufzuwiegen. Asymmetrische Verfahren werden dazu verwendet um den Schlüssel der symmetrischen Verfahren auszutauschen.
+
+\subsection{Symetrische Verschlüsselung - DES,AES}
+Für die symmetrische Verschlüsselung ist nur ein Schlüssel für die Ver- und Entschlüsselung notwendig. Dieser wird von dem Off-Card Programm erzeugt und via RSA-Verschlüsselung an die Karte gesendet. Als Verschlüsselungsalgorithmus wird DES benutzt. Dieser besitzt eine Schlüssellänge von 56-Bit. DES gilt nicht mehr als sicher da die Schlüssellänge zu kurz ist. Normalerweise nutzt man bei der modernen Verschlüsselung AES. Dieser gilt als mathematisch sicher und man kann ihn nur angreifen indem man alle möglichen Schlüssel durchprobiert. AES besitzt einen Schlüsselraum von 128 Bit und kann auf 256 Bit erweitert werden.\\ 
+AES wird nicht von der Simulationsumgebung JCOP unterstützt, deswegen muss man DES einsetzen. Im Betrieb mit einer echten Karte sollte man allerdings AES verwenden.\\
+Sowohl AES als auch DES verschlüsseln die Daten Blockweise. Deswegen gibt es verschiedene Modi beim Verschlüsseln. Hier kann man folgende Modi einstellen:
+\begin{lstlisting}
+Cipher.getInstance(Cipher.ALG_DES_CBC_NOPAD,false);
+Cipher.getInstance(Cipher.ALG_DES_CBC_PKCS5,false);
+\end{lstlisting}
+Das Cipher-Objekt spricht den Kryptologie-Prozessor der Smartcard an. Der Algorithmus ist DES. CBC steht für Cipher Block Chaining, dies ist besonderer Sicherheitsmodus damit ähnliche Daten nicht erkannt werden. NOPAD steht für No Padding, hier können nur Daten verschlüsselt werden deren Länge ein vielfaches der Blocklänge entspricht. Im Modus PKCS5 wird der Klartext um die Fehlenden Bytes 
+
+\section{OpenCard Framework - OCF}
+Das OpenCard Framework ist eine Smartcard Middleware. Hiermit kann man mit Smartcards kommunizieren. Das OpenCard Framework ist komplett in Java programmiert und damit Betriebssystemunabhängig.\\
+Um mit einer Smartcard kommunizieren zu können muss man zunächst die Verbindung aufbauen. Dafür einfach folgende Methoden ausführen:
+\begin{lstlisting}
+CardRequest cardRequest = new CardRequest(CardRequest.ANYCARD, null, PassThruCardService.class);
+cardRequest.setTimeout(1);
+card = SmartCard.waitForCard(cardRequest);
+\end{lstlisting}
+Nun kann man über die \enquote{card} Variable APDU's an die Smartcard senden. Hierfür muss man folgende Methoden senden:
+\begin{lstlisting}
+CommandAPDU commandAPDU = new CommandAPDU(instruction.length);
+commandAPDU.setLength(instruction.length);
+System.arraycopy(instruction, 0, commandAPDU.getBuffer(), 0, instruction.length);
+PassThruCardService passThru = (PassThruCardService) card.getCardService(PassThruCardService.class, true);
+ResponseAPDU responseAPDU1 = passThru.sendCommandAPDU(commandAPDU);
+\end{lstlisting}
+Zunächst wird eine APDU angelegt, danach kann man sie mit Bytes beschreiben. Über den Befehl \enquote{sendCommandAPDU} wird die D
+
+\end{document}
