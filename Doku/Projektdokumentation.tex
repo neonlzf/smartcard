@@ -59,13 +59,58 @@
 		\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen, bestehend aus Medikamente-ID(s), Menge(n) und Zeitpunkt(en)
 	\end{itemize}
 	
-	Die Patienten-ID wird zur Installation des Applets auf der Karte fest ein kodiert. Die ID ist eine Zahl vom Typ long, der auf der Smartcard in Form von 8 Bytes abgespeichert wird. Die ID kann über die Schnittstelle nur abgerufen, aber nicht verändert werden.
+	Die Patienten-ID wird zur Installation des Applets auf der Karte fest ein kodiert. Die ID ist eine Zahl vom Typ long, die auf der Smartcard in Form von 8 Bytes abgespeichert wird. Die ID kann über die Schnittstelle nur abgerufen, nicht aber verändert werden.
+	
+	Ein beispielhafter Abruf der Patienten-ID sieht wie folgt aus:
+	
+	\begin{lstlisting}
+		\send 00 08 00 00
+		Response:
+		00 00 00 00 00 00 00 01 90 00 //Patienten-ID + No-Error-Code
+	\end{lstlisting}
 	
 	Die Blutgruppe des Patienten wird, wie die Patienten-ID, zur Installation des Applets festgelegt. Sie ist als ein Byte codiert und kann anhand einer Kodierungstabelle übersetzt werden. Wie die Patienten-ID ist auch die Blutgruppe nicht manipulierbar.
 	
+	Ein beispielhafter Abruf der Patienten Blutgruppe sieht wie folgt aus:
+	
+	\begin{lstlisting}
+		\send 00 07 00 00
+		Response:
+		04 90 00 //Blutgruppe + No-Error-Code
+	\end{lstlisting}
+	
 	Auf der Smartcard wird eine Liste nicht verträglicher Medikamente gespeichert. Diese ist als eine List von jeweils 4 Byte IDs angelegt. Diese IDs können in der OffCard-Anwendung in ein Int umgewandelt und über eine Map dem entsprechenden Medikament zugeordnet werden. Die Smartcard bietet an, die Liste Elementweise auszulesen, neue Medikamente zur Liste hinzuzufügen, als auch aus der Liste zu entfernen.
 	
+	Ein beispielhaftes Hinzufügen eines Medikaments zur Liste sieht wie folgt aus:
+	
+	\begin{lstlisting}
+		\send 00 02 00 00 04 00 00 42 83 //Add Element with ID 00 00 42 83
+		Response:
+		Success: 90 00
+		Failure: 6A 83
+	\end{lstlisting}
+	
+	Ein beispielhafter Abruf eines Medikaments der Liste sieht wie folgt aus:
+	
+	\begin{lstlisting}
+		\send 00 01 00 00 //Fetch Element 0
+		Response:
+		Success: 00 00 42 83 90 00 //Drug-ID + No-Error-Code
+		Failure: 6A 83
+	\end{lstlisting}
+	
+	Ein beispielhaftes löschen eines Medikaments der Liste sieht wie folgt aus:
+		
+	\begin{lstlisting}
+		\send 00 03 00 00 04 00 00 42 83 //Remove Element with ID 00 00 42 83
+		Response:
+		Success: 90 00
+		Failure: 6A 83
+	\end{lstlisting}
+	
 	Die Liste der regelmäßig einzunehmenden Medikamente ist gleich der Liste nicht verträglicher Medikamente aufgebaut, nur das die Eintragslänge 28 Byte entspricht. Die ersten 4 Byte entsprechen der Medikamenten-ID, die folgenden 24 Byte den Einnahmezeiträumen sowie der Einnahmemenge. Diese Liste kann ebenfalls ausgelesen und manipuliert werden.
+	
+	Die Kommandos dieser Liste sind analog zur Liste der nicht verträglichen Medikamente definiert.
 	
 	Intern werden die Liste über eine, eigens für diesen Zweck erstellte, Collection organisiert. Diese bietet ein List-Interface fü das kontrollierte Hinzufügen, Löschen als auch Auslesen der Listenelemente.
 \section{Kryptologie}
