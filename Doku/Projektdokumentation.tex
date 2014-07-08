@@ -48,6 +48,16 @@
 	Um eine Absicherung gegen Angriffe bereit zu stellen, als auch die Rollen untereinander zuverlässig trennen zu können, wird eine Verschlüsselung der übertragenen Daten durchgesetzt.
 \section{OffCard}
 \section{OnCard}
+	Die OnCard-Anwendung bietet eine vollständig definierte Schnittstelle in Form von APDU-Beschreibungen an. Über diese Schnittstelle kann mit den Daten, die auf der Smartcard gespeichert sind, interagiert werden.
+	
+	Die Smartcard enthält in der folgenden Auflistung enthaltene Daten:
+	
+	\begin{itemize}
+		\item eine Patienten-ID, in Form eines 8 Byte-Wertes
+		\item die Patientenblutgruppe, codiert als Byte
+		\item eine Liste nicht verträglicher Medikamente, bestehend aus Medikamenten-IDs (4 Byte)
+		\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen, bestehend aus Medikamente-ID(s), Menge(n) und Zeitpunkt(en) (28 Byte)
+	\end{itemize}
 \section{Kryptologie}
 In diesem Kapitel werden die kryptografischen Methoden des Projektes erklärt. Zum Verschlüsseln der Daten wird ein symmetrisches Verfahren verwendet. Symmetrische Verschlüsselungsverfahren sind sehr effizient und sicher. Leider werden bei symmetrischen Verfahren nur ein Schlüssel zum Ver- und Entschlüsseln verwendet. Deswegen ist der Schlüsselaustausch sehr schwierig. Asymmetrische Verfahren können dieses Problem lösen.
 \subsection{Asymmetrische Verschlüsselung - RSA}
