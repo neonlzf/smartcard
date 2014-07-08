@@ -44,8 +44,8 @@ import java.awt.Rectangle;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 
+import opencard.core.terminal.CardTerminalException;
 import card.CardHandler;
-
 import data.MedTableModel;
 import data.PatientDataTableModel;
 
@@ -96,8 +96,10 @@ public class MainGui {
 
 	/**
 	 * Create the application.
+	 * 
+	 * @throws CardTerminalException
 	 */
-	public MainGui() {
+	public MainGui() throws CardTerminalException {
 		this.ch = CardHandler.getInstance();
 		initialize();
 	}
