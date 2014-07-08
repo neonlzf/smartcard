@@ -1,21 +1,30 @@
 package data;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
 
 public class PatientDataTableModel extends DefaultTableModel {
 
-	private int patientId;
-	private short bloodtype;
+	private long patientId;
+	private short bloodType;
+	private String[] bloodTypes = { "A -", "A +", "B -", "B +", "AB -", "AB +", "0 -", "0 +" };
 
 	public PatientDataTableModel() {
 	}
 
-	public void parseData() {
-		this.patientId = 12345;
-		this.bloodtype = 0;
+	public void parseData(byte[] patientIdRaw, byte[] bloodTypeRaw) {
+		ByteBuffer patBuffer = ByteBuffer.allocate(10);
+		patBuffer.put(patientIdRaw);
+		patBuffer.rewind();
+		this.patientId = patBuffer.getLong();
+
+		ByteBuffer btBuffer = ByteBuffer.allocate(3);
+		btBuffer.put(bloodTypeRaw);
+		btBuffer.rewind();
+		this.bloodType = (short) btBuffer.get(0);
 	}
 
 	@Override
@@ -50,9 +59,9 @@ public class PatientDataTableModel extends DefaultTableModel {
 		case 1:
 			switch (rowIndex) {
 			case 0:
-				return new Integer(this.patientId).toString();
+				return new Long(this.patientId).toString();
 			case 1:
-				return new Integer(this.bloodtype).toString();
+				return bloodTypes[this.bloodType];
 			default:
 				return "";
 			}
@@ -71,5 +80,4 @@ public class PatientDataTableModel extends DefaultTableModel {
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 
 	}
-
 }

@@ -16,7 +16,8 @@ public class MedTableModel extends DefaultTableModel {
 		this.meds = new ArrayList<Med>();
 	}
 
-	public void parseData() {
+	public void parseData(byte[] medsRaw) {
+
 		this.fireTableDataChanged();
 	}
 
