@@ -39,6 +39,7 @@ public class CardHandler implements CTListener {
 		} catch (OpenCardPropertyLoadingException plfe) {
 			System.out.println("OpenCardPropertyLoadingException: ");
 			System.out.println(plfe.getMessage());
+			plfe.printStackTrace();
 		} catch (ClassNotFoundException cnfe) {
 			System.out.println("ClassNotFoundException: ");
 			System.out.println(cnfe.getMessage());
@@ -52,6 +53,21 @@ public class CardHandler implements CTListener {
 			System.out.println("Exception: ");
 			System.out.println(e.getMessage());
 		}
+
+		byte[] selReturn = null;
+		byte[] selApplet = { 0x00, (byte) 0xA4, 0x04, 0x00, 0x0B, 0x70, 0x61, 0x74, 0x69, 0x65, 0x6E, 0x74, 0x64, 0x61,
+				0x74, 0x61, 0x00 };
+		try {
+			selReturn = this.sendInstruction(selApplet);
+		} catch (ClassNotFoundException e) {
+			// TODO Automatisch erstellter Catch-Block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Automatisch erstellter Catch-Block
+			e.printStackTrace();
+		}
+
+		System.out.println("Applet Selection returned:\n" + bytesToHex(selReturn));
 	}
 
 	public static CardHandler getInstance() {
@@ -116,5 +132,16 @@ public class CardHandler implements CTListener {
 		}
 		return ret;
 
+	}
+
+	public static String bytesToHex(byte[] bytes) {
+		char[] hexArray = "0123456789ABCDEF".toCharArray();
+		char[] hexChars = new char[bytes.length * 2];
+		for (int j = 0; j < bytes.length; j++) {
+			int v = bytes[j] & 0xFF;
+			hexChars[j * 2] = hexArray[v >>> 4];
+			hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+		}
+		return new String(hexChars);
 	}
 }
