@@ -41,7 +41,7 @@
 \section{Anwendungsbeschreibung}
 	Die Anwendung wurde zum Zweck entworfen, Mitarbeitern im medizinischem Sektor schnell Daten über die bedürftige Person bzw. dem Patienten zur Verfügung zu stellen. Zu diesem Zweck wurde ein System bestehend aus einer OffCard-Anwendung, die zur Beispielhaften Demonstration des medizinischen Personals da ist, sowie einer OnCard-Anwendung, die verschiedene Daten eines Patienten speichert, entworfen.
 	
-	Die OffCard-Anwendungen lässt es zu, eine Rolle auszuwählen. Anhand dieser Rolle kann auf verschiedene Funktionalitäten der SmartCard zugegriffen werden, je nachdem, welche Rechte die Rolle besitzt. Hauptanwendungszweck der OffCard-Anwendung ist die Anzeige der auf der SmartCard gespeicherten Daten, als auch die Manipulation dieser.
+	Die OffCard-Anwendungen lässt es zu, eine Rolle auszuwählen. Anhand dieser Rolle kann auf verschiedene Funktionalitäten der SmartCard zugegriffen werden, je nachdem welche Rechte die Rolle besitzt. Hauptanwendungszweck der OffCard-Anwendung ist die Anzeige der auf der SmartCard gespeicherten Daten, als auch die Manipulation dieser.
 	
 	Die OnCard-Anwendung speichert Patientenbezogene Daten, wie dessen Blutgruppe, dessen ID, sowie mehrere Listen von Medikamenten. Diese Daten können von den entsprechenden Rollen manipuliert werden.
 	
@@ -53,11 +53,21 @@
 	Die Smartcard enthält in der folgenden Auflistung enthaltene Daten:
 	
 	\begin{itemize}
-		\item eine Patienten-ID, in Form eines 8 Byte-Wertes
-		\item die Patientenblutgruppe, codiert als Byte
-		\item eine Liste nicht verträglicher Medikamente, bestehend aus Medikamenten-IDs (4 Byte)
-		\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen, bestehend aus Medikamente-ID(s), Menge(n) und Zeitpunkt(en) (28 Byte)
+		\item eine Patienten-ID
+		\item die Patientenblutgruppe
+		\item eine Liste nicht verträglicher Medikamente
+		\item eine List regelmäßig einzunehmender Medikamente mit Dosierungsinformationen, bestehend aus Medikamente-ID(s), Menge(n) und Zeitpunkt(en)
 	\end{itemize}
+	
+	Die Patienten-ID wird zur Installation des Applets auf der Karte fest ein kodiert. Die ID ist eine Zahl vom Typ long, der auf der Smartcard in Form von 8 Bytes abgespeichert wird. Die ID kann über die Schnittstelle nur abgerufen, aber nicht verändert werden.
+	
+	Die Blutgruppe des Patienten wird, wie die Patienten-ID, zur Installation des Applets festgelegt. Sie ist als ein Byte codiert und kann anhand einer Kodierungstabelle übersetzt werden. Wie die Patienten-ID ist auch die Blutgruppe nicht manipulierbar.
+	
+	Auf der Smartcard wird eine Liste nicht verträglicher Medikamente gespeichert. Diese ist als eine List von jeweils 4 Byte IDs angelegt. Diese IDs können in der OffCard-Anwendung in ein Int umgewandelt und über eine Map dem entsprechenden Medikament zugeordnet werden. Die Smartcard bietet an, die Liste Elementweise auszulesen, neue Medikamente zur Liste hinzuzufügen, als auch aus der Liste zu entfernen.
+	
+	Die Liste der regelmäßig einzunehmenden Medikamente ist gleich der Liste nicht verträglicher Medikamente aufgebaut, nur das die Eintragslänge 28 Byte entspricht. Die ersten 4 Byte entsprechen der Medikamenten-ID, die folgenden 24 Byte den Einnahmezeiträumen sowie der Einnahmemenge. Diese Liste kann ebenfalls ausgelesen und manipuliert werden.
+	
+	Intern werden die Liste über eine, eigens für diesen Zweck erstellte, Collection organisiert. Diese bietet ein List-Interface fü das kontrollierte Hinzufügen, Löschen als auch Auslesen der Listenelemente.
 \section{Kryptologie}
 In diesem Kapitel werden die kryptografischen Methoden des Projektes erklärt. Zum Verschlüsseln der Daten wird ein symmetrisches Verfahren verwendet. Symmetrische Verschlüsselungsverfahren sind sehr effizient und sicher. Leider werden bei symmetrischen Verfahren nur ein Schlüssel zum Ver- und Entschlüsseln verwendet. Deswegen ist der Schlüsselaustausch sehr schwierig. Asymmetrische Verfahren können dieses Problem lösen.
 \subsection{Asymmetrische Verschlüsselung - RSA}
