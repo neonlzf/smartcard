@@ -40,6 +40,7 @@ import javax.swing.border.LineBorder;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.io.IOException;
 
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
@@ -309,11 +310,35 @@ public class MainGui {
 	private class LoadAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-
 			// TODO: load Data from SmartCard
 
+			// get patient id
+			byte[] inst1 = { 0x00, 0x08, 0x00, 0x00 };
+			byte[] patientIdRaw = null;
+			try {
+				patientIdRaw = ch.sendInstruction(inst1);
+			} catch (ClassNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+
+			// get bloodtype
+			byte[] inst2 = { 0x00, 0x07, 0x00, 0x00 };
+			byte[] bloodTypeRaw = null;
+			try {
+				bloodTypeRaw = ch.sendInstruction(inst2);
+			} catch (ClassNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+
+			System.out.println("Patient-ID: " + ch.bytesToHex(patientIdRaw));
+			System.out.println("Bloodtype: " + ch.bytesToHex(bloodTypeRaw));
+
 			PatientDataTableModel patientData = new PatientDataTableModel();
-			patientData.parseData();
+			patientData.parseData(patientIdRaw, bloodTypeRaw);
 
 			MedTableModel blData = new MedTableModel();
 			blData.parseData();

@@ -2,12 +2,7 @@ package card;
 
 import java.io.IOException;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
-import com.sun.corba.se.impl.protocol.giopmsgheaders.MessageBase;
-import com.sun.xml.internal.ws.api.message.Message;
 
 import opencard.core.event.CTListener;
 import opencard.core.event.CardTerminalEvent;
@@ -26,7 +21,7 @@ public class CardHandler implements CTListener {
 
 	private SmartCard card = null;
 
-	private CardHandler() throws CardTerminalException {
+	private CardHandler() {
 		try {
 			// start the SmartCard
 
@@ -68,20 +63,20 @@ public class CardHandler implements CTListener {
 			e.printStackTrace();
 		}
 
-		byte[] ret = null;
-		byte[] data = { 0x00, 0x00, 0x00, 0x00 };
-		try {
-			ret = this.sendInstruction(data);
-		} catch (ClassNotFoundException e) {
-			// TODO Automatisch erstellter Catch-Block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Automatisch erstellter Catch-Block
-			e.printStackTrace();
-		}
+		// byte[] ret = null;
+		// byte[] data = { 0x00, 0x00, 0x00, 0x00 };
+		// try {
+		// ret = this.sendInstruction(data);
+		// } catch (ClassNotFoundException e) {
+		// // TODO Automatisch erstellter Catch-Block
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// // TODO Automatisch erstellter Catch-Block
+		// e.printStackTrace();
+		// }
 
 		System.out.println("Applet Selection returned:\n" + bytesToHex(selReturn));
-		System.out.println("Test 1 returned:\n" + bytesToHex(ret));
+		// System.out.println("Test 1 returned:\n" + bytesToHex(ret));
 
 	}
 
@@ -115,7 +110,6 @@ public class CardHandler implements CTListener {
 	@Override
 	public void cardRemoved(CardTerminalEvent arg0) throws CardTerminalException {
 		// TODO Automatisch erstellter Methoden-Stub
-
 	}
 
 	public byte[] sendData(byte[] instruction, byte[] Data) throws ClassNotFoundException, IOException {
