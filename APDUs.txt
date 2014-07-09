@@ -24,10 +24,8 @@ Blacklist: Maximum: 127 drugs --> drug as Int
 		Success Return: 0x90 00
 		Failure Return: 0x6A 84
 		
-	RemoveFromBlacklist
+	EmptyBlacklist
 		INS: 0x03
-		LC: 4
-		Daten: 0x1b 2b 3b 4b
 		Success Return: 0x90 00
 		Failure Return: 0x6A 83
 		
@@ -49,10 +47,8 @@ Drug ID (4 Byte) followed by time-slots (defined as Byte: XXXY YYYY; x-Quantity,
 		Success Return: 0x90 00
 		Failure Return: 0x6A 84
 		
-	RemoveFromBlacklist
+	EmptyWhitelist
 		INS: 0x06
-		LC: 4
-		Daten: 0x1b 2b 3b 4b --> ID of Drug
 		Success Return: 0x90 00
 		Failure Return: 0x6A 83
 
