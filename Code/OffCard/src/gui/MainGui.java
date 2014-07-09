@@ -12,6 +12,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -21,12 +23,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import opencard.core.terminal.CardTerminalException;
 import card.CardHandler;
-import data.MedTableModel;
-import data.PatientDataTableModel;
+import data.MedListModel;
+import data.PatientDataModel;
 
 public class MainGui {
 
@@ -50,9 +53,9 @@ public class MainGui {
 	private JButton btnEditWhitelist;
 	private JButton btnDeleteWhitelist;
 
-	private PatientDataTableModel patientData;
-	private MedTableModel wlData;
-	private MedTableModel blData;
+	private PatientDataModel patientData;
+	private MedListModel wlData;
+	private MedListModel blData;
 
 	private CardHandler ch;
 
@@ -122,7 +125,7 @@ public class MainGui {
 
 	}
 
-	public void loadData(PatientDataTableModel patientData, MedTableModel blData, MedTableModel wlData) {
+	public void loadData(PatientDataModel patientData, MedListModel blData, MedListModel wlData) {
 		this.patientData = patientData;
 		this.blData = blData;
 		this.wlData = wlData;
@@ -288,77 +291,182 @@ public class MainGui {
 	private class LoadAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			// TODO: load Data from SmartCard
 
-			// get patient id
-			byte[] inst1 = { 0x00, 0x08, 0x00, 0x00 };
-			byte[] patientIdRaw = null;
-			try {
-				patientIdRaw = ch.sendInstruction(inst1);
-			} catch (ClassNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			// load Data from SmartCard
+			new Runnable() {
 
-			// get bloodtype
-			byte[] inst2 = { 0x00, 0x07, 0x00, 0x00 };
-			byte[] bloodTypeRaw = null;
-			try {
-				bloodTypeRaw = ch.sendInstruction(inst2);
-			} catch (ClassNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+				@Override
+				public void run() {
+					// get patient id
+					byte[] inst1 = { 0x00, 0x08, 0x00, 0x00 };
+					byte[] patientIdRaw = null;
+					try {
+						patientIdRaw = ch.sendInstruction(inst1);
+					} catch (ClassNotFoundException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 
-			System.out.println("Patient-ID: " + ch.bytesToHex(patientIdRaw));
-			System.out.println("Bloodtype: " + ch.bytesToHex(bloodTypeRaw));
+					// get bloodtype
+					byte[] inst2 = { 0x00, 0x07, 0x00, 0x00 };
+					byte[] bloodTypeRaw = null;
+					try {
+						bloodTypeRaw = ch.sendInstruction(inst2);
+					} catch (ClassNotFoundException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 
-			PatientDataTableModel patientData = new PatientDataTableModel();
-			patientData.parseData(patientIdRaw, bloodTypeRaw);
+					System.out.println("Patient-ID: " + CardHandler.bytesToHex(patientIdRaw));
+					System.out.println("Bloodtype: " + CardHandler.bytesToHex(bloodTypeRaw));
 
-			// read black list
-			ArrayList<ByteBuffer> blRaw = new ArrayList<ByteBuffer>();
-			for (int i = 0; i < 128; i++) {
-				byte[] instBl = { 0x00, 0x01, 0x00, (byte) i };
-				byte[] blItem = null;
-				try {
-					blItem = ch.sendInstruction(instBl);
-				} catch (ClassNotFoundException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
+					PatientDataModel patientData = new PatientDataModel();
+					patientData.parseData(patientIdRaw, bloodTypeRaw);
+
+					// read blacklist
+					ArrayList<ByteBuffer> blRaw = new ArrayList<ByteBuffer>();
+					for (int i = 0; i < 128; i++) {
+						byte[] instBl = { 0x00, 0x01, 0x00, (byte) i };
+						byte[] blItem = null;
+						try {
+							blItem = ch.sendInstruction(instBl);
+						} catch (ClassNotFoundException e1) {
+							e1.printStackTrace();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+
+						System.out.println("readBlacklistItem(" + i + ") returned: " + CardHandler.bytesToHex(blItem));
+
+						if (blItem.length == 2 && blItem[0] == (byte) 0x6A && blItem[1] == (byte) 0x83) {
+							System.out.println("Blacklist - Items read: " + i);
+							break;
+						}
+
+						ByteBuffer tempBuffer = ByteBuffer.allocate(blItem.length);
+						tempBuffer.put(blItem);
+						tempBuffer.rewind();
+						blRaw.add(tempBuffer);
+					}
+
+					MedListModel blData = new MedListModel(false);
+					blData.parseData(blRaw);
+
+					// read whitelist
+					ArrayList<ByteBuffer> wlRaw = new ArrayList<ByteBuffer>();
+					for (int i = 0; i < 128; i++) {
+						byte[] instWl = { 0x00, 0x04, 0x00, (byte) i };
+						byte[] wlItem = null;
+						try {
+							wlItem = ch.sendInstruction(instWl);
+						} catch (ClassNotFoundException e1) {
+							e1.printStackTrace();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+
+						System.out.println("readWhitelistItem(" + i + ") returned: " + CardHandler.bytesToHex(wlItem));
+
+						if (wlItem.length == 2 && wlItem[0] == (byte) 0x6A && wlItem[1] == (byte) 0x83) {
+							System.out.println("Whitelist - Items read: " + i);
+							break;
+						}
+
+						ByteBuffer tempBuffer = ByteBuffer.allocate(wlItem.length);
+						tempBuffer.put(wlItem);
+						tempBuffer.rewind();
+						wlRaw.add(tempBuffer);
+					}
+
+					MedListModel wlData = new MedListModel(true);
+					wlData.parseData(wlRaw);
+
+					final PatientDataModel fpd = patientData;
+					final MedListModel fbl = blData;
+					final MedListModel fwl = wlData;
+
+					SwingUtilities.invokeLater(new Runnable() {
+
+						@Override
+						public void run() {
+							MainGui.this.loadData(fpd, fbl, fwl);
+
+						}
+					});
+
 				}
-
-				System.out.println("readBlacklistItem(" + i + ") returned: " + ch.bytesToHex(blItem));
-
-				if (blItem.length == 2 && blItem[0] == (byte) 0x6A && blItem[1] == (byte) 0x83) {
-					System.out.println("Blacklist - Items read: " + i);
-					break;
-				}
-				
-				ByteBuffer tempBuffer = ByteBuffer.allocate(blItem.length);
-				tempBuffer.put(blItem);
-				tempBuffer.rewind();
-				blRaw.add(tempBuffer);
-			}
-
-			MedTableModel blData = new MedTableModel();
-			blData.parseData(blRaw);
-
-			MedTableModel wlData = new MedTableModel();
-//			wlData.parseData(null);
-
-			MainGui.this.loadData(patientData, blData, wlData);
+			}.run();
 		}
 	}
 
 	private class SaveAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
+			new Runnable() {
 
+				@Override
+				public void run() {
+					// emptying med lists on card
+					byte[] inst1 = { 0x00, 0x03, 0x00, 0x00 };
+					try {
+						ch.sendInstruction(inst1);
+					} catch (ClassNotFoundException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+
+					byte[] inst2 = { 0x00, 0x06, 0x00, 0x00 };
+					try {
+						ch.sendInstruction(inst2);
+					} catch (ClassNotFoundException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+
+					// write blacklist to card
+					List<ByteBuffer> bufBl = MainGui.this.blData.serializeData();
+					System.out.println("blacklist buffer length: " + bufBl.size());
+					byte[] inst3 = { 0x00, 0x02, 0x00, 0x00, 0x04 };
+
+					for (Iterator iterator = bufBl.iterator(); iterator.hasNext();) {
+						ByteBuffer byteBuffer = (ByteBuffer) iterator.next();
+						byte data[] = byteBuffer.array();
+
+						try {
+							ch.sendData(inst3, data);
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+
+					// write whitelist to card
+					List<ByteBuffer> bufWl = MainGui.this.wlData.serializeData();
+					byte[] inst4 = { 0x00, 0x05, 0x00, 0x00, 0x1C };
+
+					for (Iterator iterator = bufWl.iterator(); iterator.hasNext();) {
+						ByteBuffer byteBuffer = (ByteBuffer) iterator.next();
+						byte data[] = byteBuffer.array();
+
+						try {
+							ch.sendData(inst4, data);
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}.run();
 		}
 
 	}

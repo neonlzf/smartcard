@@ -5,10 +5,10 @@ import java.util.List;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-public class DosageTableModel extends DefaultTableModel {
+public class DosagesModel extends DefaultTableModel {
 	private List<Dosage> dosage;
 
-	public DosageTableModel(List<Dosage> dosageData) {
+	public DosagesModel(List<Dosage> dosageData) {
 		this.dosage = dosageData;
 	}
 

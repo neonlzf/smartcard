@@ -6,13 +6,13 @@ import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
 
-public class PatientDataTableModel extends DefaultTableModel {
+public class PatientDataModel extends DefaultTableModel {
 
 	private long patientId;
 	private short bloodType;
 	private String[] bloodTypes = { "A -", "A +", "B -", "B +", "AB -", "AB +", "0 -", "0 +" };
 
-	public PatientDataTableModel() {
+	public PatientDataModel() {
 	}
 
 	public void parseData(byte[] patientIdRaw, byte[] bloodTypeRaw) {

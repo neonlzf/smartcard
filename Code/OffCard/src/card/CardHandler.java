@@ -50,6 +50,7 @@ public class CardHandler implements CTListener {
 			System.out.println(e.getMessage());
 		}
 
+		// Applet selection
 		byte[] selReturn = null;
 		byte[] selApplet = { 0x00, (byte) 0xA4, 0x04, 0x00, 0x0B, 0x70, 0x61, 0x74, 0x69, 0x65, 0x6E, 0x74, 0x64, 0x61,
 				0x74, 0x61, 0x00 };
@@ -63,21 +64,10 @@ public class CardHandler implements CTListener {
 			e.printStackTrace();
 		}
 
-		// byte[] ret = null;
-		// byte[] data = { 0x00, 0x00, 0x00, 0x00 };
-		// try {
-		// ret = this.sendInstruction(data);
-		// } catch (ClassNotFoundException e) {
-		// // TODO Automatisch erstellter Catch-Block
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// // TODO Automatisch erstellter Catch-Block
-		// e.printStackTrace();
-		// }
+		// Krypto init
+		// TODO
 
 		System.out.println("Applet Selection returned:\n" + bytesToHex(selReturn));
-		// System.out.println("Test 1 returned:\n" + bytesToHex(ret));
-
 	}
 
 	public static CardHandler getInstance() throws CardTerminalException {

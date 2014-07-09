@@ -21,9 +21,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import data.Dosage;
-import data.DosageTableModel;
+import data.DosagesModel;
 import data.Med;
-import data.MedTableModel;
+import data.MedListModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -37,9 +37,9 @@ public class MedEdit extends JFrame {
 	private JTextField textFieldMedName;
 	private JTable dosageTable;
 
-	private MedTableModel mtm;
+	private MedListModel mtm;
 	private Med toEdit;
-	private DosageTableModel dtm;
+	private DosagesModel dtm;
 
 	/**
 	 * Launch the application.
@@ -62,7 +62,7 @@ public class MedEdit extends JFrame {
 	 * 
 	 * @wbp.parser.constructor
 	 */
-	public MedEdit(MedTableModel mtm, boolean withDosage) {
+	public MedEdit(MedListModel mtm, boolean withDosage) {
 		setAlwaysOnTop(true);
 		setTitle("Edit List Entry");
 		final MedEdit tempFrame = this;
@@ -123,7 +123,7 @@ public class MedEdit extends JFrame {
 		contentPane.add(scrollPane, gbc_scrollPane);
 
 		dosageTable = new JTable();
-		this.dtm = new DosageTableModel(new ArrayList<Dosage>());
+		this.dtm = new DosagesModel(new ArrayList<Dosage>());
 		dosageTable.setModel(this.dtm);
 		scrollPane.setViewportView(dosageTable);
 
@@ -175,14 +175,14 @@ public class MedEdit extends JFrame {
 
 	}
 
-	public MedEdit(MedTableModel mtm, int index, boolean withDosage) {
+	public MedEdit(MedListModel mtm, int index, boolean withDosage) {
 		this(mtm, withDosage);
 
 		this.toEdit = mtm.getElement(index);
 
 		this.textFieldMedId.setText(new Integer(this.toEdit.getId()).toString());
 		this.textFieldMedName.setText(this.toEdit.getName());
-		this.dtm = new DosageTableModel(toEdit.getDosage());
+		this.dtm = new DosagesModel(toEdit.getDosage());
 		this.dosageTable.setModel(this.dtm);
 		try {
 			((DefaultTableModel) this.dosageTable.getModel()).fireTableDataChanged();

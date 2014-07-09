@@ -24,7 +24,7 @@ import java.awt.event.ActionListener;
 import javax.swing.DefaultComboBoxModel;
 
 import data.Dosage;
-import data.DosageTableModel;
+import data.DosagesModel;
 
 public class EditDosageGui extends JFrame {
 
@@ -32,7 +32,7 @@ public class EditDosageGui extends JFrame {
 	private JComboBox comboBoxTime;
 	private JComboBox comboBoxAmount;
 
-	private DosageTableModel dtm;
+	private DosagesModel dtm;
 	private int selected = -2;
 
 	/**
@@ -56,7 +56,7 @@ public class EditDosageGui extends JFrame {
 	 * 
 	 * @wbp.parser.constructor
 	 */
-	public EditDosageGui(DosageTableModel dtm) {
+	public EditDosageGui(DosagesModel dtm) {
 		setAlwaysOnTop(true);
 		this.dtm = dtm;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -125,7 +125,7 @@ public class EditDosageGui extends JFrame {
 		panel.add(btnCancel);
 	}
 
-	public EditDosageGui(DosageTableModel dtm, int selectedIndex) {
+	public EditDosageGui(DosagesModel dtm, int selectedIndex) {
 		this(dtm);
 		this.selected = selectedIndex;
 		Dosage d = this.dtm.getElement(this.selected);
