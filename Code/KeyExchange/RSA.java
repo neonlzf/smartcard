@@ -173,7 +173,7 @@ public class RSA extends Applet {
 		readBuffer(apdu, tmp, (short) 0, lc);
 		apdu.setOutgoing();
 		rsaCipher.init(rsa_privateKey, Cipher.MODE_DECRYPT);
-		outLength = rsaCipher.doFinal(tmp, (short) 0, lc, buf, (short) 0);
+		short outLength = rsaCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
 		desKey.setKey(apdu.getBuffer(), (short) 0);
 		apdu.setOutgoingLength(outLength);
 		apdu.sendBytes((short) 0, outLength); //den empfangenen Schlüssel
@@ -184,7 +184,7 @@ public class RSA extends Applet {
 		readBuffer(apdu, tmp, (short) 0, lc);
 		desCipher.init(desKey, Cipher.MODE_DECRYPT);
 		apdu.setOutgoing();
-		outLength = desCipher.doFinal(tmp, (short) 0, lc, buf, (short) 0);
+		short outLength = desCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
 		apdu.setOutgoingLength(outLength);
 		apdu.sendBytes((short) 0, outLength);
 	}
