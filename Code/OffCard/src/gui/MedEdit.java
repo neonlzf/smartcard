@@ -68,14 +68,14 @@ public class MedEdit extends JFrame {
 		final MedEdit tempFrame = this;
 		this.mtm = mtm;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 383, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.columnWidths = new int[] { 0, 0, 0 };
+		gbl_contentPane.columnWidths = new int[] { 0, 0, 0, 0 };
 		gbl_contentPane.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
-		gbl_contentPane.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gbl_contentPane.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
 		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
 		contentPane.setLayout(gbl_contentPane);
 
@@ -89,7 +89,8 @@ public class MedEdit extends JFrame {
 
 		textFieldMedId = new JTextField();
 		GridBagConstraints gbc_textFieldMedId = new GridBagConstraints();
-		gbc_textFieldMedId.insets = new Insets(0, 0, 5, 0);
+		gbc_textFieldMedId.gridwidth = 2;
+		gbc_textFieldMedId.insets = new Insets(0, 0, 5, 5);
 		gbc_textFieldMedId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textFieldMedId.gridx = 1;
 		gbc_textFieldMedId.gridy = 0;
@@ -106,17 +107,25 @@ public class MedEdit extends JFrame {
 
 		textFieldMedName = new JTextField();
 		GridBagConstraints gbc_textFieldMedName = new GridBagConstraints();
-		gbc_textFieldMedName.insets = new Insets(0, 0, 5, 0);
+		gbc_textFieldMedName.insets = new Insets(0, 0, 5, 5);
 		gbc_textFieldMedName.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textFieldMedName.gridx = 1;
 		gbc_textFieldMedName.gridy = 1;
 		contentPane.add(textFieldMedName, gbc_textFieldMedName);
 		textFieldMedName.setColumns(10);
 
+		JButton btnSearch = new JButton("Search");
+		btnSearch.addActionListener(new SearchAction());
+		GridBagConstraints gbc_btnSearch = new GridBagConstraints();
+		gbc_btnSearch.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSearch.gridx = 2;
+		gbc_btnSearch.gridy = 1;
+		contentPane.add(btnSearch, gbc_btnSearch);
+
 		JScrollPane scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-		gbc_scrollPane.gridwidth = 2;
-		gbc_scrollPane.insets = new Insets(0, 0, 5, 0);
+		gbc_scrollPane.gridwidth = 3;
+		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 0;
 		gbc_scrollPane.gridy = 2;
@@ -131,7 +140,7 @@ public class MedEdit extends JFrame {
 		FlowLayout flowLayout = (FlowLayout) panel_1.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
-		gbc_panel_1.gridwidth = 2;
+		gbc_panel_1.gridwidth = 3;
 		gbc_panel_1.insets = new Insets(0, 0, 5, 5);
 		gbc_panel_1.fill = GridBagConstraints.BOTH;
 		gbc_panel_1.gridx = 0;
@@ -154,7 +163,8 @@ public class MedEdit extends JFrame {
 		FlowLayout flowLayout_1 = (FlowLayout) panel.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.RIGHT);
 		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.gridwidth = 2;
+		gbc_panel.insets = new Insets(0, 0, 0, 5);
+		gbc_panel.gridwidth = 3;
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 0;
 		gbc_panel.gridy = 4;
@@ -263,6 +273,16 @@ public class MedEdit extends JFrame {
 			if (selectedRow > -1) {
 				MedEdit.this.dtm.removeElement(selectedRow);
 			}
+		}
+
+	}
+
+	private class SearchAction implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+
 		}
 
 	}
