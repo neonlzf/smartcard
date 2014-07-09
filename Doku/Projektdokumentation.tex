@@ -129,6 +129,7 @@ Zur Ver- und Entschlüsselung werden folgende Funktionen benutzt:
  d .. geheimer Exponent\\
  n .. Modulus\\
 Die Schlüssel werden im der Datei \enquote{irgendwas.java} erzeugt. Hier sind diese Zeilen wichtig:
+\label{RSAKeyPair}
 \begin{lstlisting}
 Cipher rsaCipher = Cipher.getInstance(Cipher.ALG_RSA_PKCS1,false);
 KeyPair keyPair = new KeyPair(KeyPair.ALG_RSA_CRT, (short)1024);
@@ -145,10 +146,10 @@ Für die symmetrische Verschlüsselung ist nur ein Schlüssel für die Ver- und 
 AES wird nicht von der Simulationsumgebung JCOP unterstützt, deswegen muss man DES einsetzen. Im Betrieb mit einer echten Karte sollte man allerdings AES verwenden.\\
 Sowohl AES als auch DES verschlüsseln die Daten Blockweise. Deswegen gibt es verschiedene Modi beim Verschlüsseln. Hier kann man folgende Modi einstellen:
 \begin{lstlisting}
-Cipher.getInstance(Cipher.ALG_DES_CBC_NOPAD,false);
-Cipher.getInstance(Cipher.ALG_DES_CBC_PKCS5,false);
+Cipher.getInstance(Cipher.ALG_DES_ECB_NOPAD,false);
+Cipher.getInstance(Cipher.ALG_DES_ECB_PKCS5,false);
 \end{lstlisting}
-Das Cipher-Objekt spricht den Kryptologie-Prozessor der Smartcard an. Der Algorithmus ist DES. CBC steht für Cipher Block Chaining, dies ist besonderer Sicherheitsmodus damit ähnliche Daten nicht erkannt werden. NOPAD steht für No Padding, hier können nur Daten verschlüsselt werden deren Länge ein vielfaches der Blocklänge entspricht. Im Modus PKCS5 wird der Klartext um die Fehlenden Bytes 
+Das Cipher-Objekt spricht den Kryptologie-Prozessor der Smartcard an. Der Algorithmus ist DES. ECB steht für Electronic Code Book, dies ist besonderer Sicherheitsmodus damit ähnliche Daten nicht erkannt werden. NOPAD steht für No Padding, hier können nur Daten verschlüsselt werden deren Länge ein vielfaches der Blocklänge entspricht. Im Modus PKCS5 wird der Klartext um die Fehlenden Bytes 
 
 \section{OpenCard Framework - OCF}
 Das OpenCard Framework ist eine Smartcard Middleware. Hiermit kann man mit Smartcards kommunizieren. Das OpenCard Framework ist komplett in Java programmiert und damit Betriebssystemunabhängig.\\
@@ -166,6 +167,31 @@ System.arraycopy(instruction, 0, commandAPDU.getBuffer(), 0, instruction.length)
 PassThruCardService passThru = (PassThruCardService) card.getCardService(PassThruCardService.class, true);
 ResponseAPDU responseAPDU1 = passThru.sendCommandAPDU(commandAPDU);
 \end{lstlisting}
-Zunächst wird eine APDU angelegt, danach kann man sie mit Bytes beschreiben. Über den Befehl \enquote{sendCommandAPDU} wird die D
+Zunächst wird eine APDU angelegt, danach kann man sie mit Bytes beschreiben. Über den Befehl \enquote{sendCommandAPDU} wird die APDU an die Smartcard gesendet und als Rückgabewert wird die empfangene APDU zurückgeben.\\
+\section{Schlüsselaustausch mit OCF}
+Die Abbildung \ref{fig:KeyExchange} visualisiert den Ablauf.
+
+\begin{figure}[h]
+\includegraphics[width=1.2\linewidth]{./KeyExchange}
+\caption{Schlüsselaustausch}
+\label{fig:KeyExchange}
+\end{figure}
+
+\begin{tabular}{|l|l|}
+\hline Funktion & befindet sich in Datei \\ 
+\hline
+\hline sendInstruction( ) & Install.java \\ 
+\hline sendData( ) & Install.java \\ 
+\hline GenerateRSAPair()  & RSA.java \\ 
+\hline getPublicExponent() & RSA.java \\ 
+\hline getPublicModulus() & RSA.java \\ 
+\hline GenerateDESKey() & Install.java \\ 
+\hline EncodeDESKey() & Install.java \\
+\hline DecodeAndSetDesKey() & RSA.java \\
+\hline Decode() & RSA.java \\
+\hline 
+\end{tabular} 
+
+Beim installieren der Smartcard-Applikation wird ein RSA Schlüsselpaar erzeugt. Dies geschieht über die in Kapitel \ref{RSAKeyPair}. Über die definierten Kommando APDU's \\\enquote{EXPORT\_RSA\_PUB\_EXP} und \enquote{EXPORT\_RSA\_PUB\_MOD} kann man sich den Public-Key der Karte ausgeben lassen. Der Exponent und Modulus könne in Java durch die BigInteger-Klasse zu einem RSA-Key zusammengesetzt werden. Dann wird der DES-Key von der OffCard-Anwendung erzeugt. Diesen kann man nun mit RSA verschlüsseln und an die Karte senden. In der Karte wird der Schlüssl mit dem privaten RSA-Schlüssel entschlüsselt. Nun ist der DES-Schlüssel ausgetauscht und man kann effizient symmetrisch verschlüsseln. Um mit DES Ver- und Entschlüsseln zu können ist es wichtig die Richtigen Modi einzustellen. Die virtuelle Karte von JCOP unterstützt nicht alle Modi. Wenn man den CBC\footnote{Cipher Block Chaining}-Modus einstellt entschlüsselt die virtuelle Karte nicht korrekt. Dies kann aber auch auf eine Inkompatibilität zwischen dem Ver- und Entschlüsselungsalgorithmus von Java und JavaCard hinweisen. Wenn man den Modus ECB\footnote{Eletronic Code Book} einstellt wird korrekt entschlüsselt. 
 
 \end{document}
