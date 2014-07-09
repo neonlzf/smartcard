@@ -59,10 +59,8 @@ public class Install implements CTListener {
 		KeyFactory factory = KeyFactory.getInstance("RSA");
 		PublicKey pub = factory.generatePublic(spec);
 //		System.out.println(pub);
-
-		KeyGenerator keyGen = KeyGenerator.getInstance("DES");
-		keyGen.init(56);
-		SecretKey secretKey = keyGen.generateKey();
+		
+		SecretKey secretKey = generateDESKey();
 		Cipher desCipher = Cipher.getInstance("DES/ECB/NoPadding");
 		desCipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
@@ -71,10 +69,7 @@ public class Install implements CTListener {
 			System.out.print(Integer.toHexString(b & 0x00ff) + ",");
 		System.out.println();
 
-		final Cipher cipher = Cipher.getInstance("RSA");
-		cipher.init(Cipher.ENCRYPT_MODE, pub);
-		
-		byte[] cipherText = cipher.doFinal(secretKey.getEncoded());
+		byte[] cipherText = encodeDesKey(secretKey.getEncoded(),pub);
 		byte[] answer = { 0x00, (byte) 0xD2, 0x00, 0x00, (byte) cipherText.length };
 		
 		System.out.print("Send Secret Key: ");
@@ -157,4 +152,15 @@ public class Install implements CTListener {
 
 	}
 
+	private static SecretKey generateDESKey() throws NoSuchAlgorithmException{
+		KeyGenerator keyGen = KeyGenerator.getInstance("DES");
+		keyGen.init(56);
+		return keyGen.generateKey();
+	}
+	
+	private static byte[] encodeDesKey(byte[] secretKey,PublicKey pub) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
+		final Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, pub);
+		return cipher.doFinal(secretKey);
+	}
 }

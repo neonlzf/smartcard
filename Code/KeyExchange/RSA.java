@@ -81,14 +81,7 @@ public class RSA extends Applet {
 
 	public RSA() {
 		tmp = JCSystem.makeTransientByteArray((short) 256, JCSystem.CLEAR_ON_RESET);
-		rsaCipher = Cipher.getInstance(Cipher.ALG_RSA_PKCS1, false);
-		keyPair = new KeyPair(KeyPair.ALG_RSA_CRT, KeyBuilder.LENGTH_RSA_1024);
-		rsa_privateKey = (RSAPrivateCrtKey) keyPair.getPrivate();
-		rsa_publicKey = (RSAPublicKey) keyPair.getPublic();
-		rsa_publicKey.setExponent(exponent, (short) 0, (short) 3);
-		keyPair.genKeyPair();
-		desCipher = Cipher.getInstance(Cipher.ALG_DES_ECB_NOPAD, false);
-		desKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES, false);
+		generateRSAKeyPair();
 
 	}
 
@@ -125,23 +118,10 @@ public class RSA extends Applet {
 			break;
 		// decode cipher text from input
 		case RSA_DECODE:
-			readBuffer(apdu, tmp, (short) 0, lc);
-			apdu.setOutgoing();
-			rsaCipher.init(rsa_privateKey, Cipher.MODE_DECRYPT);
-			outLength = rsaCipher.doFinal(tmp, (short) 0, lc, buf, (short) 0);
-			desKey.setKey(apdu.getBuffer(), (short) 0);
-			apdu.setOutgoingLength(outLength);
-			apdu.sendBytes((short) 0, outLength); //den empfangenen Schlüssel
-			// nicht zurück senden
+			DecodeAndSetDESKey(apdu,lc);
 			break;
 		case DES_DECODE:
-			readBuffer(apdu, tmp, (short) 0, lc);
-			desCipher.init(desKey, Cipher.MODE_DECRYPT);
-			apdu.setOutgoing();
-			outLength = desCipher.doFinal(tmp, (short) 0, lc, buf, (short) 0);
-			apdu.setOutgoingLength(outLength);
-			apdu.sendBytes((short) 0, outLength);
-
+			Decode(apdu,lc);
 		case ISO7816.CLA_ISO7816:
 			if (selectingApplet()) {
 				ISOException.throwIt(ISO7816.SW_NO_ERROR);
@@ -176,5 +156,36 @@ public class RSA extends Applet {
 			readCount = (short) apdu.receiveBytes(ISO7816.OFFSET_CDATA);
 			Util.arrayCopy(buf, ISO7816.OFFSET_CDATA, dest, offset, readCount);
 		}
+	}
+	
+	private void generateRSAKeyPair(){
+		rsaCipher = Cipher.getInstance(Cipher.ALG_RSA_PKCS1, false);
+		keyPair = new KeyPair(KeyPair.ALG_RSA_CRT, KeyBuilder.LENGTH_RSA_1024);
+		rsa_privateKey = (RSAPrivateCrtKey) keyPair.getPrivate();
+		rsa_publicKey = (RSAPublicKey) keyPair.getPublic();
+		rsa_publicKey.setExponent(exponent, (short) 0, (short) 3);
+		keyPair.genKeyPair();
+		desCipher = Cipher.getInstance(Cipher.ALG_DES_ECB_NOPAD, false);
+		desKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES, false);
+	}
+	
+	private void DecodeAndSetDESKey(APDU apdu,short lc){
+		readBuffer(apdu, tmp, (short) 0, lc);
+		apdu.setOutgoing();
+		rsaCipher.init(rsa_privateKey, Cipher.MODE_DECRYPT);
+		outLength = rsaCipher.doFinal(tmp, (short) 0, lc, buf, (short) 0);
+		desKey.setKey(apdu.getBuffer(), (short) 0);
+		apdu.setOutgoingLength(outLength);
+		apdu.sendBytes((short) 0, outLength); //den empfangenen Schlüssel
+		// nicht zurück senden
+	}
+	
+	private void Decode(APDU apdu,short lc){
+		readBuffer(apdu, tmp, (short) 0, lc);
+		desCipher.init(desKey, Cipher.MODE_DECRYPT);
+		apdu.setOutgoing();
+		outLength = desCipher.doFinal(tmp, (short) 0, lc, buf, (short) 0);
+		apdu.setOutgoingLength(outLength);
+		apdu.sendBytes((short) 0, outLength);
 	}
 }
