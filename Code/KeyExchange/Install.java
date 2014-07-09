@@ -59,6 +59,7 @@ public class Install implements CTListener {
 		KeyFactory factory = KeyFactory.getInstance("RSA");
 		PublicKey pub = factory.generatePublic(spec);
 //		System.out.println(pub);
+
 		
 		SecretKey secretKey = generateDESKey();
 		Cipher desCipher = Cipher.getInstance("DES/ECB/NoPadding");
@@ -77,8 +78,8 @@ public class Install implements CTListener {
 			System.out.print(Integer.toHexString(b & 0x00ff) + ",");
 		System.out.println();
 		
-		byte[] hallowelt = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j','k','m','n','o','p','q' };
-		byte[] cipherHallo = desCipher.doFinal(hallowelt);
+		byte[] hallowelt = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j','k','m','n','o','p','q','b','l','u','b','b' };
+		byte[] cipherHallo = cipherwithPadding(desCipher, hallowelt);		
 		byte[] ins = { 0x00, (byte) 0xD4, 0x00, 0x00, (byte) cipherHallo.length };
 
 		System.out.print("Send Hallo Welt: ");
@@ -162,5 +163,15 @@ public class Install implements CTListener {
 		final Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.ENCRYPT_MODE, pub);
 		return cipher.doFinal(secretKey);
+	}
+	
+	private static byte[] cipherwithPadding(Cipher desCipher, byte[] text) throws IllegalBlockSizeException, BadPaddingException{
+		if(text.length % 8 != 0){
+			byte[] newText = new byte[text.length + (8-(text.length % 8))];
+			System.out.println("Textlenght"+newText.length);
+			System.arraycopy(text, 0, newText, 0, text.length);
+			return desCipher.doFinal(newText);
+		}
+		return desCipher.doFinal(text);
 	}
 }
