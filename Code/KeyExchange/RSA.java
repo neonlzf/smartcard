@@ -23,12 +23,12 @@ import javacardx.crypto.Cipher;
  *      79 .|.v.E........|y 5C C8 BE 97 9D 74 94 B6 C4 6A 86 48 23 17 F4 5D
  *      \....t...j.H#..] DE 4B 19 00 03 F1 5A C4 A0 7E 0B 17 B6 61 0B A6
  *      .K....Z..~...a.. 6A A2 C1 AA 21 32 CE 97 A6 CB 23 34 39 98 7B A0
- *      j...!2....#49.{. 90 00 .. Status: No Error cm> /send
- *      00D2000040027CE5760745BCB3D08B03FBE61E7C795CC8BE979D7494B6C46A86482317F45DDE4B190003F15AC4A07E0B17B6610BA66AA2C1AA2132CE97A6CB233439987BA0 =>
- *      00 D2 00 00 40 02 7C E5 76 07 45 BC B3 D0 8B 03 ....@.|.v.E..... FB E6
- *      1E 7C 79 5C C8 BE 97 9D 74 94 B6 C4 6A 86 ...|y\....t...j. 48 23 17 F4
- *      5D DE 4B 19 00 03 F1 5A C4 A0 7E 0B H#..].K....Z..~. 17 B6 61 0B A6 6A
- *      A2 C1 AA 21 32 CE 97 A6 CB 23 ..a..j...!2....# 34 39 98 7B A0 49.{.
+ *      j...!2....#49.{. 90 00 .. Status: No Error cm> /send 00D2000040027
+ *      CE5760745BCB3D08B03FBE61E7C795CC8BE979D7494B6C46A86482317F45DDE4B190003F15AC4A07E0B17B6610BA66AA2C1AA2132CE97A6CB233439987BA0
+ *      => 00 D2 00 00 40 02 7C E5 76 07 45 BC B3 D0 8B 03 ....@.|.v.E..... FB
+ *      E6 1E 7C 79 5C C8 BE 97 9D 74 94 B6 C4 6A 86 ...|y\....t...j. 48 23 17
+ *      F4 5D DE 4B 19 00 03 F1 5A C4 A0 7E 0B H#..].K....Z..~. 17 B6 61 0B A6
+ *      6A A2 C1 AA 21 32 CE 97 A6 CB 23 ..a..j...!2....# 34 39 98 7B A0 49.{.
  *      (3893 usec) <= 01 02 03 04 05 06 07 90 00 ......... Status: No Error
  * 
  */
@@ -118,10 +118,10 @@ public class RSA extends Applet {
 			break;
 		// decode cipher text from input
 		case RSA_DECODE:
-			DecodeAndSetDESKey(apdu,lc);
+			DecodeAndSetDESKey(apdu, lc);
 			break;
 		case DES_DECODE:
-			Decode(apdu,lc);
+			Decode(apdu, lc);
 		case ISO7816.CLA_ISO7816:
 			if (selectingApplet()) {
 				ISOException.throwIt(ISO7816.SW_NO_ERROR);
@@ -157,8 +157,8 @@ public class RSA extends Applet {
 			Util.arrayCopy(buf, ISO7816.OFFSET_CDATA, dest, offset, readCount);
 		}
 	}
-	
-	private void generateRSAKeyPair(){
+
+	private void generateRSAKeyPair() {
 		rsaCipher = Cipher.getInstance(Cipher.ALG_RSA_PKCS1, false);
 		keyPair = new KeyPair(KeyPair.ALG_RSA_CRT, KeyBuilder.LENGTH_RSA_1024);
 		rsa_privateKey = (RSAPrivateCrtKey) keyPair.getPrivate();
@@ -168,24 +168,24 @@ public class RSA extends Applet {
 		desCipher = Cipher.getInstance(Cipher.ALG_DES_ECB_NOPAD, false);
 		desKey = (DESKey) KeyBuilder.buildKey(KeyBuilder.TYPE_DES, KeyBuilder.LENGTH_DES, false);
 	}
-	
-	private void DecodeAndSetDESKey(APDU apdu,short lc){
+
+	private void DecodeAndSetDESKey(APDU apdu, short lc) {
 		readBuffer(apdu, tmp, (short) 0, lc);
 		apdu.setOutgoing();
 		rsaCipher.init(rsa_privateKey, Cipher.MODE_DECRYPT);
 		short outLength = rsaCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
 		desKey.setKey(apdu.getBuffer(), (short) 0);
 		apdu.setOutgoingLength(outLength);
-		apdu.sendBytes((short) 0, outLength); //den empfangenen Schlüssel
+		apdu.sendBytes((short) 0, (short) 0); // den empfangenen Schlüssel
 		// nicht zurück senden
 	}
-	
-	private void Decode(APDU apdu,short lc){
+
+	private void Decode(APDU apdu, short lc) {
 		readBuffer(apdu, tmp, (short) 0, lc);
 		desCipher.init(desKey, Cipher.MODE_DECRYPT);
 		apdu.setOutgoing();
 		short outLength = desCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
 		apdu.setOutgoingLength(outLength);
-		apdu.sendBytes((short) 0, outLength);
+		apdu.sendBytes((short) 0, (short) 0);
 	}
 }
