@@ -345,10 +345,10 @@ public class MainGui {
 			}
 
 			MedTableModel blData = new MedTableModel();
-			blData.parseData(null);
+			blData.parseData(blRaw);
 
 			MedTableModel wlData = new MedTableModel();
-			wlData.parseData(null);
+//			wlData.parseData(null);
 
 			MainGui.this.loadData(patientData, blData, wlData);
 		}

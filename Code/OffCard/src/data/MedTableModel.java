@@ -1,6 +1,8 @@
 package data;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
@@ -16,7 +18,13 @@ public class MedTableModel extends DefaultTableModel {
 		this.meds = new ArrayList<Med>();
 	}
 
-	public void parseData(byte[] medsRaw) {
+	public void parseData(ArrayList<ByteBuffer> medsRaw) {
+		for (Iterator iterator = medsRaw.iterator(); iterator.hasNext();) {
+			ByteBuffer byteBuffer = (ByteBuffer) iterator.next();
+			Med tempMed = new Med();
+			tempMed.setId(byteBuffer.getInt());
+			this.meds.add(tempMed);
+		}
 
 		this.fireTableDataChanged();
 	}

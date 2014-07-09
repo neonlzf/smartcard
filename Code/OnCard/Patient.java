@@ -12,13 +12,17 @@ public class Patient extends Applet {
 		// GP-compliant JavaCard applet registration
 		new Patient().register(bArray, (short) (bOffset + 1), bArray[bOffset]);
 
+		byte li = bArray[bOffset];
+		byte lc = bArray[bOffset + li + 1];
+		byte la = bArray[bOffset + li + lc + 2];
 		blacklist = new DrugList((byte) 4);
 		whitelist = new DrugList((byte) 28);
 		PatientID = new byte[8];
+
 		// bLength must be 9
 		for (byte i = 0; i < 8; i++)
-			PatientID[i] = bArray[bOffset + i];
-		Bloodtype = (byte) bArray[bOffset + 8];
+			PatientID[i] = bArray[bOffset + li + lc + 3 + i];
+		Bloodtype = (byte) bArray[bOffset + li + lc + la + 2];
 		buffer = new byte[whitelist.datalength];
 	}
 
@@ -31,7 +35,7 @@ public class Patient extends Applet {
 	static byte Bloodtype;
 
 	static byte[] PatientID;
-	
+
 	byte i;
 
 	public void process(APDU apdu) {
@@ -55,7 +59,7 @@ public class Patient extends Applet {
 			addToBlacklist(buf, apdu);
 			break;
 		case (byte) 0x03:
-			removeFromBlacklist(buf, apdu);
+			emptyBlacklist();
 			break;
 		case (byte) 0x04:
 			sendWhitelist(buf, apdu);
@@ -64,7 +68,7 @@ public class Patient extends Applet {
 			addToWhitelist(buf, apdu);
 			break;
 		case (byte) 0x06:
-			removeFromWhitelist(buf, apdu);
+			emptyWhitelist();
 			break;
 		case (byte) 0x07:
 			sendBloodType(buf, apdu);
@@ -90,8 +94,7 @@ public class Patient extends Applet {
 
 	private void sendBlacklist(byte[] buf, APDU apdu) {
 
-		short element = Util
-				.getShort(buf, (short) (ISO7816.OFFSET_P1 & 0x00FF));
+		short element = Util.getShort(buf, (short) (ISO7816.OFFSET_P1 & 0x00FF));
 		byte buffer[] = blacklist.getElement(element);
 		Util.arrayCopy(buffer, (short) 0, buf, (short) 0, blacklist.datalength);
 		sendEncryptedAPDU(apdu, blacklist.datalength);
@@ -99,21 +102,16 @@ public class Patient extends Applet {
 
 	private void addToBlacklist(byte[] buf, APDU apdu) {
 
-		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer,
-				(short) 0, blacklist.datalength);
+		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer, (short) 0, blacklist.datalength);
 		blacklist.add(buffer);
 	}
 
-	private void removeFromBlacklist(byte[] buf, APDU apdu) {
-
-		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer,
-				(short) 0, blacklist.datalength);
-		blacklist.remove(buffer);
+	private void emptyBlacklist() {
+		blacklist.empty();
 	}
 
 	private void sendWhitelist(byte[] buf, APDU apdu) {
-		short element = Util
-				.getShort(buf, (short) (ISO7816.OFFSET_P1 & 0x00FF));
+		short element = Util.getShort(buf, (short) (ISO7816.OFFSET_P1 & 0x00FF));
 		byte buffer[] = whitelist.getElement(element);
 		Util.arrayCopy(buffer, (short) 0, buf, (short) 0, whitelist.datalength);
 		sendEncryptedAPDU(apdu, whitelist.datalength);
@@ -121,16 +119,12 @@ public class Patient extends Applet {
 
 	private void addToWhitelist(byte[] buf, APDU apdu) {
 
-		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer,
-				(short) 0, whitelist.datalength);
+		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer, (short) 0, whitelist.datalength);
 		whitelist.add(buffer);
 	}
-	
-	private void removeFromWhitelist(byte[] buf, APDU apdu) {
 
-		Util.arrayCopy(buf, (short) (ISO7816.OFFSET_CDATA & 0x00FF), buffer,
-				(short) 0, blacklist.datalength);
-		whitelist.remove(buffer);
+	private void emptyWhitelist() {
+		whitelist.empty();
 	}
 
 	private void sendBloodType(byte[] buf, APDU apdu) {

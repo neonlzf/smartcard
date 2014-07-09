@@ -55,18 +55,8 @@ public class DrugList {
 			ISOException.throwIt(ISO7816.SW_FILE_FULL);
 	}
 
-	public void remove(byte[] ID) {
-
-		for (i = 0; i < listLength * datalength; i = (short) (i + datalength)) {
-			if (Util.arrayCompare(list, i, ID, (short) 0, (short) 4) == 0) {
-				Util.arrayCopy(list, (short) (i + datalength), list, i,
-						(short) (size() * datalength - i));
-				firstfree--;
-				capLeft++;
-				ISOException.throwIt(ISO7816.SW_NO_ERROR);
-			}
-		}
-		ISOException.throwIt(ISO7816.SW_RECORD_NOT_FOUND);
+	public void empty() {		
+		firstfree = 0;
+		capLeft = listLength;
 	}
 }
-
