@@ -94,12 +94,22 @@
 		Abbildung \ref{fig:dosageedit} stellt das Menü zur Bearbeitung eines Dosierungseintrages dar. Hier können Uhrzeit und Anzahl dieses Eintrages festgelegt werden.
 		
 		\subsection{Architektur}
+		Im Bild \ref{fig:classdiagramm} ist das Klassendiagramm der Offcard-Anwendung zu sehen. Das Projekt ist dabei in die Pakete "card", "data" und "gui" unterteilt.
+		
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=\linewidth]{./klassendiagramm.png}
 			\caption{Klassendiagramm der Offcard-Anwendung}
 			\label{fig:classdiagramm}
 		\end{figure}
+		
+		Im "card"-Paket befindet sich die Klasse "CardHandler". Diese kapselt den vollständigen Zugriff zur SmartCard und stellt darüber hinaus Methoden zur Verschlüsselung bereit. Realisiert ist die Klasse dabei als Singleton, um sicherzustellen, dass nur eine Instanz für die gesamte Anwendung instantiiert wird.
+		
+		Das Paket "gui" enthält die drei Klassen für die grafische Benutzeroberfläche. Darüber hinaus stellt "MainGui" die main-Methode zum Programmeinstieg bereit.
+		
+		Im Paket "data" liegen alle Klassen zur anwendungsseitigen Datenhaltung. Die Klasse "PatientDataModel" enthält die von der SmartCard gelesenen Stammdaten des Patienten. Die Klassen "MedListModel", "Med", "DosageModel" und "Dosage" kapseln die Daten der Medikamentenlisten. Die Model-Klassen erweitern "DefaultTableModel" um die Darstellung in einer Tabelle zu gewährleisten. Darüber hinaus enthalten "PatientDataModel" und "MedListModel" die Methoden "parseData()" und "serializeData()". Diese Klassen konvertieren die von der Karte gelesenen Byte-Arrays in von der Anwendung verarbeitbare Daten und zurück. 
+		
+		Zur Verwaltung der Medikamentenstammdaten dienen die Klassen "MedDataManagement", "MedData" und "MedEntry". Die eigentlichen Daten bilden dabei "MedData" und "MedEntry", wobei "MedDataManagement" zur Deserialisierung dieser aus einer XML-Datei dient. Dies wird über das JAXB-Framework realisiert.
 	
 	\section{OnCard}
 		Die OnCard-Anwendung bietet eine vollständig definierte Schnittstelle in Form einer APDU-Beschreibung an. Über diese Schnittstelle kann mit den Daten, die auf der Smartcard gespeichert sind, interagiert werden.
