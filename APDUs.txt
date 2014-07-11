@@ -64,3 +64,13 @@ ReadPatientID: //PatienID as Long
 	LE: 8
 	Return: 0x1b 2b 3b 4b ... --> Compose to Long by 1b ++ 2b ++ 3b ++ 4b ++ ...
 
+***********************************
+
+ExportPublicExponent:
+	INS: 0xF2
+	
+ExportPublicModulus:
+	INS: 0xF0
+	
+DecodeAndSetDESKey:
+	INS: 0xD2
