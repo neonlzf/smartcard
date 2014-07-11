@@ -57,13 +57,21 @@
 			\item[Automatisierte Medikamentenausgabe] Über die Liste regelmäßig einzunehmender Me\-dikamente inklusive Dosierungsinformationen könnten dem Patienten an einem Automaten Medikamente aushändigt werden.
 		\end{description}
 	\section{OffCard}
+		Dieser Abschnitt beschreibt die OffCard-Anwendung und geht auf die zugrunde liegende Architektur ein.
 	
+	\subsection{Anwendungsbeschreibung}
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=.75\linewidth]{./maingui.png}
 			\caption{Hauptfenster der Offcard-Anwendung}
 			\label{fig:maingui}
 		\end{figure}
+		
+		Abbildung \ref{fig:maingui} zeigt das Hauptfenster der Offcard-Anwendung. Über die Schaltflächen "Load" und "Save" werden die Daten von der SmartCard gelesen bzw. auf die SmartCard geschrieben. Über das im oberen linken Teil des Fensters befindliche Drop-Down-Menü kann der jeweilige Akteur gewählt werden. So hat beispielsweise der Hausarzt vollen Zugriff, während der Pfleger nur Daten lesen kann.
+		
+		Im Bereich Patientendaten sind die Stammdaten des Patienten zu sehen. Dabei handelt es sich um seine ID, zb. die Krankenversicherungsnummer, und seine Blutgruppe. Durch die Speicherung einer eindeutigen ID, ist es möglich patientenbezogene Daten von Online-Diensten anzufordern und in die Anwendung einzubinden. Die Blutgruppen wird darüber hinaus als wichtige Information bereitgehalten.
+		
+		Darunter sind die Medikamenten-Whitelist und -Blacklist angeordnet. Diese können über Markierung und die Schaltflächen "Add", "Edit" und "Delete" bearbeitet werden.
 		
 		\begin{figure}[H]
 			\centering
@@ -72,6 +80,10 @@
 			\label{fig:mededit}
 		\end{figure}
 		
+		Die Abbildung \ref{fig:mededit} zeigt das Fenster zur Editierung eines Medikamentenlisteneintrages. Durch Eingabe eines Teilstrings im Feld "Med-Name" und anschließender Betätigung der "Search"-Schaltfläche wird aus den Medikamentenstammdaten der vollständige Name und die entsprechende Medikamenten-ID geladen. Diese Stammdaten werden in einer XML-Datei vorgehalten, welche zu Programmstart geladen wird.
+		
+		Des Weiteren enthält das Medikamenteneditierungsfenster eine Liste der vom Arzt vorgeschrieben Dosierungen, bestehend aus Uhrzeit in vollen Stunden und Einheiten. Diese kommt jedoch nur bei der Whitelist, der Liste einzunehmender Medikamente, zum Einsatz. 
+		
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=.4\linewidth]{./dosageeditgui.png}
@@ -79,6 +91,9 @@
 			\label{fig:dosageedit}
 		\end{figure}
 		
+		Abbildung \ref{fig:dosageedit} stellt das Menü zur Bearbeitung eines Dosierungseintrages dar. Hier können Uhrzeit und Anzahl dieses Eintrages festgelegt werden.
+		
+		\subsection{Architektur}
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=\linewidth]{./klassendiagramm.png}
