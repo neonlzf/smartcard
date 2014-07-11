@@ -54,11 +54,11 @@
 	
 		\begin{description}
 			\item[Notarzt] Im Falle eines Unfalls muss der Notarzt schnell auf Informationen wie Blutgruppe, nicht verträgliche Medikamente und aktuell verschriebene Medikamente zugreifen können, auch wenn der Patient bewusstlos ist. 
-			\item[Automatisierte Medikamentenausgabe] Über die Liste regelmäßig einzunehmender Me\-dikamente inklusive Dosierungsinformationen könnten dem Patienten an einem Automaten Medikamente aushändigt werden.
+			\item[Automatisierte Medikamentenausgabe] Über die Liste regelmäßig einzunehmender Me\-dikamente, inklusive Dosierungsinformationen, könnten dem Patienten an einem Automaten Medikamente aushändigt werden.
 		\end{description}
 		
 		\subsection{Aufgabenverteilung}
-		Das gesamte Projekt wurde innerhalb der vergebenen Aufgabenbereiche zunächst separat entwickelt und am Ende zusammengeführt. Die Verantwortlichkeiten sind dabei der Tabelle zu entnehmen:
+		Das gesamte Projekt wurde innerhalb der vergebenen Aufgabenbereiche zunächst separat entwickelt und am Ende zusammengeführt. Die Verantwortlichkeiten sind dabei der folgenden Tabelle zu entnehmen, haben sich bei der Zusammenführung jedoch nochmals überschnitten.
 		
 				\begin{table}[H]
 					\centering
@@ -70,7 +70,9 @@
 						\hline Meissner, Roy  & Oncard-Anwendung \\ 
 						\hline 
 					\end{tabular} 
-				\end{table}		
+				\end{table}
+		
+		Die gesamte Dokumentation, der Code und eine Änderungshistorie kann auf Github gefunden werden. Das zugehörige Repository ist unter \url{https://github.com/neonlzf/smartcard} zu finden.
 		
 	\section{OffCard}
 		Dieser Abschnitt beschreibt die OffCard-Anwendung und geht auf die zugrunde liegende Architektur ein.
@@ -128,7 +130,7 @@
 		Zur Verwaltung der Medikamentenstammdaten dienen die Klassen "MedDataManagement", "MedData" und "MedEntry". Die eigentlichen Daten bilden dabei "MedData" und "MedEntry", wobei "MedDataManagement" zur Deserialisierung dieser aus einer XML-Datei dient. Dies wird über das JAXB-Framework realisiert.
 	
 	\section{OnCard}
-		Die OnCard-Anwendung bietet eine vollständig definierte Schnittstelle in Form einer APDU-Beschreibung an. Über diese Schnittstelle kann mit den Daten, die auf der Smartcard gespeichert sind, interagiert werden.
+		Die OnCard-Anwendung bietet eine vollständig definierte Schnittstelle in Form einer APDU-Beschreibung\footnote{in der Datei APDUs.txt zu finden} an. Über diese Schnittstelle kann mit den Daten, die auf der Smartcard gespeichert sind, interagiert werden.
 		
 		Die Patienten-ID wird zur Installation des Applets auf der Karte fest kodiert. Die ID ist eine Zahl vom Typ long, die auf der Smartcard in Form von 8 Bytes abgespeichert wird. Long wurde gewählt um jedem Menschen eine solche Karte aushändigen zu können, ohne das die IDs ausgehen. Die ID kann über die Schnittstelle nur abgerufen, jedoch nicht verändert werden.
 		
@@ -140,7 +142,7 @@
 			00 00 00 00 00 00 00 01 90 00 //Patienten-ID + No-Error-Code
 		\end{lstlisting}
 		
-		Die Blutgruppe des Patienten wird, wie die Patienten-ID, zur Installation des Applets festgelegt. Sie ist als ein Byte codiert und kann anhand einer Kodierungstabelle übersetzt werden. Wie die Patienten-ID ist auch die Blutgruppe nicht manipulierbar.
+		Die Blutgruppe des Patienten wird, wie die Patienten-ID, zur Installation des Applets festgelegt. Sie ist als ein Byte codiert und kann anhand einer Kodierungstabelle\footnote{diese ist in der Datei APDUs.txt zu finden} übersetzt werden. Wie die Patienten-ID ist auch die Blutgruppe nicht manipulierbar.
 		
 		Ein beispielhafter Abruf der Patienten Blutgruppe sieht wie folgt aus:
 		
