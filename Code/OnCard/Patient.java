@@ -16,7 +16,7 @@ import javacardx.crypto.Cipher;
 public class Patient extends Applet {
 
 	/**
-	 * EXPORT_RSA_PUBLIC_Key = F0
+	 * EXPORT_RSA_PUBLIC_Modulus = F0
 	 */
 	private final static byte EXPORT_RSA_PUB_MOD = (byte) 0xF0;
 
@@ -33,14 +33,14 @@ public class Patient extends Applet {
 	/**
 	 * =D2
 	 */
-	private final static byte RSA_DECODE = (byte) 0xD2;
+	private final static byte SET_DES_KEY = (byte) 0xD2;
 
 	/**
 	 * =D4
 	 */
 	private final static byte DES_DECODE = (byte) 0xD4;
 
-	private static final byte DES_CODE = (byte) 0xD6;
+	private static final byte DES_ENCODE = (byte) 0xD6;
 
 	/** Temporary buffer in RAM. */
 	byte[] tmp;
@@ -99,21 +99,15 @@ public class Patient extends Applet {
 			return;
 		}
 
-		// Decrypt APDU Data --> resolves in decrypted APDU
-		// ************************************************
-
 		byte[] buf = apdu.getBuffer();
-		short outLength;
 		short lc = (short) (buf[ISO7816.OFFSET_LC] & 0x00FF);
 
 		switch (buf[ISO7816.OFFSET_INS]) {
-		// case (byte) 0x00:
-		// imHere(buf, apdu);
-		// break;
 		case (byte) 0x01:
 			sendBlacklist(buf, apdu);
 			break;
 		case (byte) 0x02:
+			Decode(apdu, lc);
 			addToBlacklist(buf, apdu);
 			break;
 		case (byte) 0x03:
@@ -123,6 +117,7 @@ public class Patient extends Applet {
 			sendWhitelist(buf, apdu);
 			break;
 		case (byte) 0x05:
+			Decode(apdu, lc);
 			addToWhitelist(buf, apdu);
 			break;
 		case (byte) 0x06:
@@ -141,22 +136,10 @@ public class Patient extends Applet {
 		case EXPORT_RSA_PUB_MOD:
 			exportPublicModulus(apdu);
 			break;
-		// export other parties modulus and public exponent
-		case RSA_ENCODE:
-			// rsa_encode(apdu);
-			readBuffer(apdu, tmp, (short) 0, lc);
-			apdu.setOutgoing();
-			rsaCipher.init(rsa_publicKey, Cipher.MODE_ENCRYPT);
-			outLength = rsaCipher.doFinal(tmp, (short) 0, lc, buf, (short) 0);
-			apdu.setOutgoingLength(outLength);
-			apdu.sendBytes((short) 0, outLength);
-			break;
 		// decode cipher text from input
-		case RSA_DECODE:
+		case SET_DES_KEY:
 			DecodeAndSetDESKey(apdu, lc);
 			break;
-		case DES_DECODE:
-			Decode(apdu, lc);
 		case ISO7816.CLA_ISO7816:
 			if (selectingApplet()) {
 				ISOException.throwIt(ISO7816.SW_NO_ERROR);
@@ -165,17 +148,6 @@ public class Patient extends Applet {
 		default:
 			ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
 		}
-	}
-
-	private void imHere(byte[] buf, APDU apdu) {
-		buf[0] = 'I';
-		buf[1] = 'M';
-		buf[2] = '_';
-		buf[3] = 'H';
-		buf[4] = 'E';
-		buf[5] = 'R';
-		buf[6] = 'E';
-		sendAPDU(apdu, (short) 7);
 	}
 
 	private void sendBlacklist(byte[] buf, APDU apdu) {
@@ -228,23 +200,21 @@ public class Patient extends Applet {
 	}
 
 	private void sendAPDU(APDU apdu, short len) {
-		// Encrypt APDU		
+		short length = Encode(apdu, len);
 		apdu.setOutgoing();
-		apdu.setOutgoingLength(len);
-		apdu.sendBytes((short) 0, len);
+		apdu.setOutgoingLength(length);
+		apdu.sendBytes((short) 0, length);
 		ISOException.throwIt(ISO7816.SW_NO_ERROR);
 	}
 
 	// Krypto related methods
 	private void exportPublicModulus(APDU apdu) {
-		byte buffer[] = apdu.getBuffer();
-		short expLen = rsa_publicKey.getModulus(buffer, (short) 0);
+		short expLen = rsa_publicKey.getModulus(apdu.getBuffer(), (short) 0);
 		apdu.setOutgoingAndSend((short) 0, (short) expLen);
 	}
 
 	private void exportPublicExponent(APDU apdu) {
-		byte buffer[] = apdu.getBuffer();
-		short expLen = rsa_publicKey.getExponent(buffer, (short) 0);
+		short expLen = rsa_publicKey.getExponent(apdu.getBuffer(), (short) 0);
 		apdu.setOutgoingAndSend((short) 0, (short) expLen);
 	}
 
@@ -274,25 +244,22 @@ public class Patient extends Applet {
 
 	private void DecodeAndSetDESKey(APDU apdu, short lc) {
 		readBuffer(apdu, tmp, (short) 0, lc);
-		apdu.setOutgoing();
 		rsaCipher.init(rsa_privateKey, Cipher.MODE_DECRYPT);
-		short outLength = rsaCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
+		rsaCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
 		desKey.setKey(apdu.getBuffer(), (short) 0);
-		apdu.setOutgoingLength(outLength);
-		apdu.sendBytes((short) 0, (short) 0); // den empfangenen Schlüssel
-		// nicht zurück senden
+		ISOException.throwIt(ISO7816.SW_NO_ERROR);
 	}
 
 	private void Decode(APDU apdu, short lc) {
 		readBuffer(apdu, tmp, (short) 0, lc);
 		desCipher.init(desKey, Cipher.MODE_DECRYPT);
-		apdu.setOutgoing();
-		short outLength = desCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
-		apdu.setOutgoingLength(outLength);
-		apdu.sendBytes((short) 0, (short) 0);
+		desCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
 	}
-	
-	private void Encode(APDU apdu, byte[] in){
-		//TODO
+
+	private short Encode(APDU apdu, short lc) {
+		Util.arrayCopy(apdu.getBuffer(), (short) 0, tmp, (short) 0, lc);
+		desCipher.init(desKey, Cipher.MODE_ENCRYPT);
+		short outLength = desCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
+		return outLength;
 	}
 }
