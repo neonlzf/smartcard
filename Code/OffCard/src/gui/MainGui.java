@@ -301,7 +301,7 @@ public class MainGui {
 					byte[] inst1 = { 0x00, 0x08, 0x00, 0x00 };
 					byte[] patientIdRaw = null;
 					try {
-						patientIdRaw = ch.sendInstruction(inst1);
+						patientIdRaw = ch.decodeDES(ch.sendInstruction(inst1));
 					} catch (ClassNotFoundException e1) {
 						e1.printStackTrace();
 					} catch (IOException e1) {
@@ -312,7 +312,7 @@ public class MainGui {
 					byte[] inst2 = { 0x00, 0x07, 0x00, 0x00 };
 					byte[] bloodTypeRaw = null;
 					try {
-						bloodTypeRaw = ch.sendInstruction(inst2);
+						bloodTypeRaw = ch.decodeDES(ch.sendInstruction(inst2));
 					} catch (ClassNotFoundException e1) {
 						e1.printStackTrace();
 					} catch (IOException e1) {
@@ -331,7 +331,7 @@ public class MainGui {
 						byte[] instBl = { 0x00, 0x01, 0x00, (byte) i };
 						byte[] blItem = null;
 						try {
-							blItem = ch.sendInstruction(instBl);
+							blItem = ch.decodeDES(ch.sendInstruction(instBl));
 						} catch (ClassNotFoundException e1) {
 							e1.printStackTrace();
 						} catch (IOException e1) {
@@ -340,7 +340,7 @@ public class MainGui {
 
 						System.out.println("readBlacklistItem(" + i + ") returned: " + CardHandler.bytesToHex(blItem));
 
-						if (blItem.length == 2 && blItem[0] == (byte) 0x6A && blItem[1] == (byte) 0x83) {
+						if (blItem.length == 0) {
 							System.out.println("Blacklist - Items read: " + i);
 							break;
 						}
@@ -360,7 +360,7 @@ public class MainGui {
 						byte[] instWl = { 0x00, 0x04, 0x00, (byte) i };
 						byte[] wlItem = null;
 						try {
-							wlItem = ch.sendInstruction(instWl);
+							wlItem = ch.decodeDES(ch.sendInstruction(instWl));
 						} catch (ClassNotFoundException e1) {
 							e1.printStackTrace();
 						} catch (IOException e1) {
@@ -369,7 +369,7 @@ public class MainGui {
 
 						System.out.println("readWhitelistItem(" + i + ") returned: " + CardHandler.bytesToHex(wlItem));
 
-						if (wlItem.length == 2 && wlItem[0] == (byte) 0x6A && wlItem[1] == (byte) 0x83) {
+						if (wlItem.length == 0) {
 							System.out.println("Whitelist - Items read: " + i);
 							break;
 						}
@@ -435,13 +435,17 @@ public class MainGui {
 					for (Iterator iterator = bufBl.iterator(); iterator.hasNext();) {
 						ByteBuffer byteBuffer = (ByteBuffer) iterator.next();
 						byte data[] = byteBuffer.array();
-
+						System.out.println("Data: " + data.length + " " + ch.bytesToHex(data));
 						try {
-							ch.sendData(inst3, data);
+							byte cryptedData[] = ch.cipherwithPadding(data);
+							System.out
+									.println("Crypted Data: " + cryptedData.length + " " + ch.bytesToHex(cryptedData));
+							inst3[4] = (byte) cryptedData.length;
+							ch.sendData(inst3, cryptedData);
 						} catch (ClassNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						} catch (IOException e) {
+						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
@@ -456,11 +460,13 @@ public class MainGui {
 						byte data[] = byteBuffer.array();
 
 						try {
-							ch.sendData(inst4, data);
+							byte cryptedData[] = ch.cipherwithPadding(data);
+							inst4[4] = (byte) cryptedData.length;
+							ch.sendData(inst4, cryptedData);
 						} catch (ClassNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						} catch (IOException e) {
+						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}

@@ -33,6 +33,12 @@ public class CardHandler implements CTListener {
 
 	private SmartCard card = null;
 
+	private Cipher desCipher;
+
+	private Cipher desDecodeCipher;
+
+	private SecretKey secretKey;
+
 	private CardHandler() {
 		try {
 			// start the SmartCard
@@ -98,9 +104,12 @@ public class CardHandler implements CTListener {
 			PublicKey pub = factory.generatePublic(spec);
 			// System.out.println(pub);
 
-			SecretKey secretKey = generateDESKey();
-			Cipher desCipher = Cipher.getInstance("DES/ECB/NoPadding");
+			secretKey = generateDESKey();
+			desCipher = Cipher.getInstance("DES/ECB/NoPadding");
 			desCipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+			desDecodeCipher = Cipher.getInstance("DES/ECB/NoPadding");
+			desDecodeCipher.init(Cipher.DECRYPT_MODE, secretKey);
 
 			System.out.print("Secret Key:");
 			for (Byte b : secretKey.getEncoded())
@@ -198,15 +207,34 @@ public class CardHandler implements CTListener {
 		return cipher.doFinal(secretKey);
 	}
 
-	private byte[] cipherwithPadding(Cipher desCipher, byte[] text) throws IllegalBlockSizeException,
-			BadPaddingException {
+	public byte[] decodeDES(byte[] src) {
+		byte[] temp = new byte[src.length - src.length % 8];
+		for (int i = 0; i < temp.length; i++) {
+			temp[i] = src[i];
+		}
+		try {
+			return this.desDecodeCipher.doFinal(temp);
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Blocksize: " + src.length);
+			e.printStackTrace();
+			return null;
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+
+	public byte[] cipherwithPadding(byte[] text) throws IllegalBlockSizeException, BadPaddingException {
 		if (text.length % 8 != 0) {
 			byte[] newText = new byte[text.length + (8 - (text.length % 8))];
 			System.out.println("Textlenght" + newText.length);
 			System.arraycopy(text, 0, newText, 0, text.length);
-			return desCipher.doFinal(newText);
+			return this.desCipher.doFinal(newText);
 		}
-		return desCipher.doFinal(text);
+		return this.desCipher.doFinal(text);
 	}
 
 	public static String bytesToHex(byte[] bytes) {

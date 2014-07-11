@@ -253,13 +253,19 @@ public class Patient extends Applet {
 	private void Decode(APDU apdu, short lc) {
 		readBuffer(apdu, tmp, (short) 0, lc);
 		desCipher.init(desKey, Cipher.MODE_DECRYPT);
-		desCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
+		desCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 5);
 	}
 
 	private short Encode(APDU apdu, short lc) {
-		Util.arrayCopy(apdu.getBuffer(), (short) 0, tmp, (short) 0, lc);
+		if (lc % 8 != 0) {
+			for (i = (byte) lc; i < lc + lc % 8; i++) {
+				tmp[i] = 0x00;
+			}
+		}
+		Util.arrayCopy(apdu.getBuffer(), (short) 0, tmp, (short) 0, (short) (lc + lc % 8));
 		desCipher.init(desKey, Cipher.MODE_ENCRYPT);
-		short outLength = desCipher.doFinal(tmp, (short) 0, lc, apdu.getBuffer(), (short) 0);
+		short outLength = desCipher.doFinal(tmp, (short) 0, (short) (lc + lc % 8), apdu.getBuffer(), (short) 0);
 		return outLength;
+//		return lc;
 	}
 }
