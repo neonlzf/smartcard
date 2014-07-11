@@ -1,34 +1,31 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import java.awt.GridBagLayout;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-
-import java.awt.Insets;
-
-import javax.swing.JTextField;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import data.Dosage;
 import data.DosagesModel;
 import data.Med;
+import data.MedDataManagement;
+import data.MedEntry;
 import data.MedListModel;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.FlowLayout;
-import java.util.ArrayList;
 
 public class MedEdit extends JFrame {
 
@@ -40,6 +37,7 @@ public class MedEdit extends JFrame {
 	private MedListModel mtm;
 	private Med toEdit;
 	private DosagesModel dtm;
+	private MedDataManagement mdm;
 
 	/**
 	 * Launch the application.
@@ -67,6 +65,7 @@ public class MedEdit extends JFrame {
 		setTitle("Edit List Entry");
 		final MedEdit tempFrame = this;
 		this.mtm = mtm;
+		this.mdm = MedDataManagement.getInstance();
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 383, 300);
 		contentPane = new JPanel();
@@ -281,8 +280,14 @@ public class MedEdit extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-
+			List<MedEntry> tempList = MedEdit.this.mdm.search(MedEdit.this.textFieldMedName.getText());
+			if (tempList.size() == 1) {
+				MedEntry me = tempList.get(0);
+				MedEdit.this.textFieldMedId.setText(new Integer(me.getId()).toString());
+				MedEdit.this.textFieldMedName.setText(me.getName());
+			}else{
+				MedEdit.this.textFieldMedId.setText("?");
+			}
 		}
 
 	}

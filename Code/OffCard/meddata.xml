@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<medData>
+    <data>
+        <id>0</id>
+        <name>unknown</name>
+    </data>
+    <data>
+        <id>1</id>
+        <name>Aspirin</name>
+    </data>
+    <data>
+        <id>2</id>
+        <name>Ibuprofen</name>
+    </data>
+    <data>
+        <id>3</id>
+        <name>Paracetamol</name>
+    </data>
+    <data>
+        <id>4</id>
+        <name>Antiallergika</name>
+    </data>
+    <data>
+        <id>5</id>
+        <name>Grippostad</name>
+    </data>
+</medData>

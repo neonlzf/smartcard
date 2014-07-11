@@ -14,10 +14,12 @@ public class MedListModel extends DefaultTableModel {
 	private static final long serialVersionUID = 1L;
 	private List<Med> meds;
 	private boolean withDosage;
+	private MedDataManagement mdm;
 
 	public MedListModel(boolean withDosage) {
 		this.meds = new ArrayList<Med>();
 		this.withDosage = withDosage;
+		this.mdm = MedDataManagement.getInstance();
 	}
 
 	public void parseData(ArrayList<ByteBuffer> medsRaw) {
@@ -25,6 +27,9 @@ public class MedListModel extends DefaultTableModel {
 			ByteBuffer byteBuffer = (ByteBuffer) iterator.next();
 			Med tempMed = new Med();
 			tempMed.setId(byteBuffer.getInt());
+
+			// search Med name
+			tempMed.setName(mdm.getMedName(tempMed.getId()));
 
 			// parsing dosage list
 			if (this.withDosage) {
@@ -79,7 +84,7 @@ public class MedListModel extends DefaultTableModel {
 					tempBuf.put(dosageByte);
 				}
 			}
-			
+
 			ret.add(tempBuf);
 		}
 

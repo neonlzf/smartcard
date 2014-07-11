@@ -1,7 +1,19 @@
 package card;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.swing.JOptionPane;
 
 import opencard.core.event.CTListener;
@@ -67,7 +79,45 @@ public class CardHandler implements CTListener {
 		// Krypto init
 		// TODO
 
-		System.out.println("Applet Selection returned:\n" + bytesToHex(selReturn));
+		try {
+			byte[] insGetExp = { 0x00, (byte) 0x00F2 };
+			byte[] insGetMod = { 0x00, (byte) 0x00F0 };
+
+			System.out.print("Get Exponent: ");
+			byte[] pubModulusCache = this.sendInstruction(insGetExp);
+			byte[] pubModulus = new byte[pubModulusCache.length - 2];
+
+			System.out.print("Get Modulus: ");
+			byte[] pubExpCache = this.sendInstruction(insGetMod);
+			byte[] pubExp = new byte[pubExpCache.length - 1];
+			System.arraycopy(pubModulusCache, 0, pubModulus, 0, pubModulusCache.length - 2);
+			System.arraycopy(pubExpCache, 0, pubExp, 1, pubExpCache.length - 2);
+			// pubExp[0] = (byte) (pubExp[0] & 0x7F);
+			RSAPublicKeySpec spec = new RSAPublicKeySpec(new BigInteger(pubExp), new BigInteger(pubModulus));
+			KeyFactory factory = KeyFactory.getInstance("RSA");
+			PublicKey pub = factory.generatePublic(spec);
+			// System.out.println(pub);
+
+			SecretKey secretKey = generateDESKey();
+			Cipher desCipher = Cipher.getInstance("DES/ECB/NoPadding");
+			desCipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+			System.out.print("Secret Key:");
+			for (Byte b : secretKey.getEncoded())
+				System.out.print(Integer.toHexString(b & 0x00ff) + ",");
+			System.out.println();
+
+			byte[] cipherText = encodeDesKey(secretKey.getEncoded(), pub);
+			byte[] answer = { 0x00, (byte) 0xD2, 0x00, 0x00, (byte) cipherText.length };
+
+			System.out.print("Send Secret Key: ");
+			for (Byte b : this.sendData(answer, cipherText))
+				System.out.print(Integer.toHexString(b & 0x00ff) + ",");
+			System.out.println();
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Krypto Init failed!", "FAIL!!!", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public static CardHandler getInstance() throws CardTerminalException {
@@ -121,9 +171,9 @@ public class CardHandler implements CTListener {
 		PassThruCardService passThru = (PassThruCardService) card.getCardService(PassThruCardService.class, true);
 		for (Byte b : commandAPDU.getBuffer()) {
 			if (b.intValue() <= 15 && b.intValue() >= 0) {
-				System.err.print("0" + Integer.toHexString(b & 0x00ff));
+				System.out.print("0" + Integer.toHexString(b & 0x00ff));
 			} else
-				System.err.print(Integer.toHexString(b & 0x00ff));
+				System.out.print(Integer.toHexString(b & 0x00ff));
 		}
 		System.out.println();
 		ResponseAPDU responseAPDU1 = passThru.sendCommandAPDU(commandAPDU);
@@ -133,6 +183,30 @@ public class CardHandler implements CTListener {
 		}
 		return ret;
 
+	}
+
+	private SecretKey generateDESKey() throws NoSuchAlgorithmException {
+		KeyGenerator keyGen = KeyGenerator.getInstance("DES");
+		keyGen.init(56);
+		return keyGen.generateKey();
+	}
+
+	private byte[] encodeDesKey(byte[] secretKey, PublicKey pub) throws NoSuchAlgorithmException,
+			NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+		final Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, pub);
+		return cipher.doFinal(secretKey);
+	}
+
+	private byte[] cipherwithPadding(Cipher desCipher, byte[] text) throws IllegalBlockSizeException,
+			BadPaddingException {
+		if (text.length % 8 != 0) {
+			byte[] newText = new byte[text.length + (8 - (text.length % 8))];
+			System.out.println("Textlenght" + newText.length);
+			System.arraycopy(text, 0, newText, 0, text.length);
+			return desCipher.doFinal(newText);
+		}
+		return desCipher.doFinal(text);
 	}
 
 	public static String bytesToHex(byte[] bytes) {
