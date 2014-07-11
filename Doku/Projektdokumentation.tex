@@ -56,10 +56,28 @@
 			\item[Notarzt] Im Falle eines Unfalls muss der Notarzt schnell auf Informationen wie Blutgruppe, nicht verträgliche Medikamente und aktuell verschriebene Medikamente zugreifen können, auch wenn der Patient bewusstlos ist. 
 			\item[Automatisierte Medikamentenausgabe] Über die Liste regelmäßig einzunehmender Me\-dikamente inklusive Dosierungsinformationen könnten dem Patienten an einem Automaten Medikamente aushändigt werden.
 		\end{description}
+		
+		\subsection{Aufgabenverteilung}
+		Das gesamte Projekt wurde innerhalb der vergebenen Aufgabenbereiche zunächst separat entwickelt und am Ende zusammengeführt. Die Verantwortlichkeiten sind dabei der Tabelle zu entnehmen:
+		
+				\begin{table}[H]
+					\centering
+					\begin{tabular}[c]{|l|l|}
+						\hline Name & Aufgabenbereich \\ 
+						\hline
+						\hline Krause, Sebastian & Offcard-Anwendung \\ 
+						\hline Kupferschmied, Robert & Verschlüsselung/Kryptografie \\ 
+						\hline Meissner, Roy  & Oncard-Anwendung \\ 
+						\hline 
+					\end{tabular} 
+				\end{table}		
+		
 	\section{OffCard}
 		Dieser Abschnitt beschreibt die OffCard-Anwendung und geht auf die zugrunde liegende Architektur ein.
 	
-	\subsection{Anwendungsbeschreibung}
+	\subsection{Beschreibung der Offcard-Anwendung}
+			Abbildung \ref{fig:maingui} zeigt das Hauptfenster der Offcard-Anwendung. Über die Schaltflächen "Load" und "Save" werden die Daten von der SmartCard gelesen bzw. auf die SmartCard geschrieben. Über das im oberen linken Teil des Fensters befindliche Drop-Down-Menü kann der jeweilige Akteur gewählt werden. So hat beispielsweise der Hausarzt vollen Zugriff, während der Pfleger nur Daten lesen kann.
+	
 		\begin{figure}[H]
 			\centering
 			\includegraphics[width=.75\linewidth]{./maingui.png}
@@ -67,9 +85,7 @@
 			\label{fig:maingui}
 		\end{figure}
 		
-		Abbildung \ref{fig:maingui} zeigt das Hauptfenster der Offcard-Anwendung. Über die Schaltflächen "Load" und "Save" werden die Daten von der SmartCard gelesen bzw. auf die SmartCard geschrieben. Über das im oberen linken Teil des Fensters befindliche Drop-Down-Menü kann der jeweilige Akteur gewählt werden. So hat beispielsweise der Hausarzt vollen Zugriff, während der Pfleger nur Daten lesen kann.
-		
-		Im Bereich Patientendaten sind die Stammdaten des Patienten zu sehen. Dabei handelt es sich um seine ID, zb. die Krankenversicherungsnummer, und seine Blutgruppe. Durch die Speicherung einer eindeutigen ID, ist es möglich patientenbezogene Daten von Online-Diensten anzufordern und in die Anwendung einzubinden. Die Blutgruppen wird darüber hinaus als wichtige Information bereitgehalten.
+		Im Bereich Patientendaten sind die Stammdaten des Patienten zu sehen. Dabei handelt es sich um seine ID, zb. die Krankenversicherungsnummer, und seine Blutgruppe. Durch die Speicherung einer eindeutigen ID, ist es möglich patientenbezogene Daten von Online-Diensten anzufordern und in die Anwendung einzubinden. Die Blutgruppe wird darüber hinaus als wichtige Information bereitgehalten.
 		
 		Darunter sind die Medikamenten-Whitelist und -Blacklist angeordnet. Diese können über Markierung und die Schaltflächen "Add", "Edit" und "Delete" bearbeitet werden.
 		
@@ -82,7 +98,7 @@
 		
 		Die Abbildung \ref{fig:mededit} zeigt das Fenster zur Editierung eines Medikamentenlisteneintrages. Durch Eingabe eines Teilstrings im Feld "Med-Name" und anschließender Betätigung der "Search"-Schaltfläche wird aus den Medikamentenstammdaten der vollständige Name und die entsprechende Medikamenten-ID geladen. Diese Stammdaten werden in einer XML-Datei vorgehalten, welche zu Programmstart geladen wird.
 		
-		Des Weiteren enthält das Medikamenteneditierungsfenster eine Liste der vom Arzt vorgeschrieben Dosierungen, bestehend aus Uhrzeit in vollen Stunden und Einheiten. Diese kommt jedoch nur bei der Whitelist, der Liste einzunehmender Medikamente, zum Einsatz. 
+		Des Weiteren enthält das Medikamenteneditierungsfenster eine Liste der vom Arzt vor\-ge\-schrie\-ben\-en Dosierungen, bestehend aus Uhrzeit in vollen Stunden und Einheiten. Diese kommt jedoch nur bei der Whitelist, der Liste einzunehmender Medikamente, zum Einsatz. 
 		
 		\begin{figure}[H]
 			\centering
@@ -174,7 +190,7 @@
 			
 			Bei asymmetrischen Verschlüsselungsverfahren werden Schlüsselpaare für die Verschlüs\-selung benutzt. Diese Schlüsselpaare bestehen aus einem Public-Key und einem Private-Key. Der Public-Key kann publiziert werden. Den Private-Key muss man geheim halten.
 		
-			Die Schlüssel setzen sich aus einem Exponenten und einem Modulus. Der Modulus ist eine sehr große Zahl, bei RSA-1024 eine Zahl im Bereich von $ 2^{1024} $ und setzt sich aus zwei Primzahlen zusammen. Der Modulus ist im Public- und Private-Key gleich. Die Exponenten unterscheiden sich allerdings.
+			Die Schlüssel setzen sich aus einem Exponenten und einem Modulus zusammen. Der Modulus ist eine sehr große Zahl, bei RSA-1024 eine Zahl im Bereich von $ 2^{1024} $ und setzt sich aus zwei Primzahlen zusammen. Der Modulus ist im Public- und Private-Key gleich. Die Exponenten unterscheiden sich allerdings.
 		
 			Zur Ver- und Entschlüsselung werden folgende Funktionen benutzt:  
 			 $$ G = K^{e}\mod{n} $$
@@ -185,7 +201,7 @@
 			  n & \text{ ... Modulus} & &
 			 \end{align*}
 			 
-			Die Schlüssel werden im der Datei \enquote{irgendwas.java} erzeugt. Hier sind diese Zeilen wichtig:
+			Die Schlüssel werden in der Datei \enquote{irgendwas.java} erzeugt. Hier sind diese Zeilen wichtig:
 			\label{RSAKeyPair}
 			\begin{lstlisting}
 				Cipher rsaCipher = Cipher.getInstance(Cipher.ALG_RSA_PKCS1,false);
@@ -194,13 +210,13 @@
 				RSAPrivateCrtKey rsa_privateKey = (RSAPrivateCrtKey) keyPair.getPrivate();
 				RSAPublicKey rsa_publicKey = (RSAPublicKey) keyPair.getPublic();
 			\end{lstlisting}
-			Die JCOP Shell hat beim erstellen der Schlüssel leider ein paar Fehler. Hier kann beim erzeugen des öffentlichen Schlüssels kein echter öffentlicher Exponent erzeugt werden, stattdessen wird nur eine konstante binäre 17 zurückgegeben.
+			Die JCOP Shell hat beim Erstellen der Schlüssel leider ein paar Fehler. Hier kann beim Erzeugen des öffentlichen Schlüssels kein echter öffentlicher Exponent erzeugt werden, stattdessen wird nur eine konstante binäre 17 zurückgegeben.
 		
 			Auf einer echten Karte dürfte dieser Fehler nicht auftreten.
 		
 			Die Verschlüsselung mit asymmetrischen Verfahren ist nicht so effizient, wie die Verschlüsselung mit symmetrischen Verfahren. Deswegen ist es sinnvoll die symmetrische und asymmetrische Verfahren zu kombinieren um die Vorteile aufzuwiegen. Asymmetrische Verfahren werden dazu verwendet um den Schlüssel der symmetrischen Verfahren auszutauschen.
 	
-		\subsection{Symetrische Verschlüsselung - DES,AES}
+		\subsection{Symetrische Verschlüsselung - DES, AES}
 			Für die symmetrische Verschlüsselung ist nur ein Schlüssel für die Ver- und Entschlüs\-selung notwendig. Dieser wird von dem Off-Card Programm erzeugt und via RSA-Verschlüs\-selung an die Karte gesendet. Als Verschlüsselungsalgorithmus wird DES benutzt. Dieser besitzt eine Schlüssellänge von 56-Bit. DES gilt nicht mehr als sicher da die Schlüssellänge zu kurz ist. Normalerweise nutzt man bei der modernen Verschlüsselung AES. Dieser gilt als mathematisch sicher und man kann ihn nur angreifen indem man alle möglichen Schlüssel durchprobiert. AES besitzt einen Schlüsselraum von 128 Bit und kann auf 256 Bit erweitert werden.
 			
 			AES wird nicht von der Simulationsumgebung JCOP unterstützt, deswegen muss man DES einsetzen. Im Betrieb mit einer echten Karte sollte man allerdings AES verwenden.
@@ -212,12 +228,12 @@
 				Cipher.getInstance(Cipher.ALG_DES_ECB_PKCS5,false);
 			\end{lstlisting}
 			
-			Das Cipher-Objekt spricht den Kryptologie-Prozessor der Smartcard an. Der Algorithmus ist DES. ECB steht für Electronic Code Book, dies ist besonderer Sicherheitsmodus damit ähnliche Daten nicht erkannt werden. NOPAD steht für No Padding, hier können nur Daten verschlüsselt werden deren Länge ein vielfaches der Blocklänge entspricht. Im Modus PKCS5 wird der Klartext um die Fehlenden Bytes 
+			Das Cipher-Objekt spricht den Kryptologie-Prozessor der Smartcard an. Der Algorithmus ist DES. ECB steht für Electronic Code Book, dies ist besonderer Sicherheitsmodus damit ähnliche Daten nicht erkannt werden. NOPAD steht für No Padding, hier können nur Daten verschlüsselt werden deren Länge ein vielfaches der Blocklänge entspricht. Im Modus PKCS5 wird der Klartext um die fehlenden Bytes ergänzt.
 				
 	\section{OpenCard Framework - OCF}
 		Das OpenCard Framework ist eine Smartcard Middleware. Hiermit kann man mit Smartcards kommunizieren. Das OpenCard Framework ist komplett in Java programmiert und damit Betriebssystemunabhängig.
 		
-		Um mit einer Smartcard kommunizieren zu können muss man zunächst die Verbindung aufbauen. Dafür einfach folgende Methoden ausführen:
+		Um mit einer Smartcard kommunizieren zu können, muss man zunächst die Verbindung aufbauen. Dafür ist folgende Methoden ausführen:
 		
 		\begin{lstlisting}
 			CardRequest cardRequest = new CardRequest(CardRequest.ANYCARD, null, PassThruCardService.class);
@@ -266,5 +282,5 @@
 		\end{table}
 		
 		\newpage
-		Beim installieren der Smartcard-Applikation wird ein RSA Schlüsselpaar erzeugt. Dies geschieht über die in Kapitel \ref{RSAKeyPair}. Über die definierten Kommando APDU's \\\enquote{EXPORT\_RSA\_PUB\_EXP} und \enquote{EXPORT\_RSA\_PUB\_MOD} kann man sich den Pub\-lic-Key der Karte ausgeben lassen. Der Exponent und Modulus könne in Java durch die BigInteger-Klasse zu einem RSA-Key zusammengesetzt werden. Dann wird der DES-Key von der OffCard-Anwendung erzeugt. Diesen kann man nun mit RSA verschlüsseln und an die Karte senden. In der Karte wird der Schlüssl mit dem privaten RSA-Schlüssel entschlüsselt. Nun ist der DES-Schlüssel ausgetauscht und man kann effizient symmetrisch verschlüsseln. Um mit DES Ver- und Entschlüsseln zu können ist es wichtig die Richtigen Modi einzustellen. Die virtuelle Karte von JCOP unterstützt nicht alle Modi. Wenn man den CBC\footnote{Cipher Block Chaining}-Modus einstellt entschlüsselt die virtuelle Karte nicht korrekt. Dies kann aber auch auf eine Inkompatibilität zwischen dem Ver- und Entschlüsselungsalgorithmus von Java und JavaCard hinweisen. Wenn man den Modus ECB\footnote{Eletronic Code Book} einstellt wird korrekt entschlüsselt. 
+		Beim installieren der Smartcard-Applikation wird ein RSA Schlüsselpaar erzeugt. Dies geschieht über die in Kapitel \ref{RSAKeyPair}. Über die definierten Kommando APDU's \\\enquote{EXPORT\_RSA\_PUB\_EXP} und \enquote{EXPORT\_RSA\_PUB\_MOD} kann man sich den Pub\-lic-Key der Karte ausgeben lassen. Der Exponent und Modulus könne in Java durch die BigInteger-Klasse zu einem RSA-Key zusammengesetzt werden. Dann wird der DES-Key von der OffCard-Anwendung erzeugt. Diesen kann man nun mit RSA verschlüsseln und an die Karte senden. In der Karte wird der Schlüssl mit dem privaten RSA-Schlüssel entschlüsselt. Nun ist der DES-Schlüssel ausgetauscht und man kann effizient symmetrisch verschlüsseln. Um mit DES ver- und entschlüsseln zu können ist es wichtig die richtigen Modi einzustellen. Die virtuelle Karte von JCOP unterstützt nicht alle Modi. Wenn man den CBC\footnote{Cipher Block Chaining}-Modus einstellt entschlüsselt die virtuelle Karte nicht korrekt. Dies kann jedoch auch auf eine Inkompatibilität zwischen dem Ver- und Entschlüsselungsalgorithmus von Java und JavaCard hinweisen. Wenn man den Modus ECB\footnote{Eletronic Code Book} einstellt wird korrekt entschlüsselt. 
 \end{document}
